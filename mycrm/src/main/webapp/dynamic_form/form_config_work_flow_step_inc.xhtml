@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ace:dialog id="newWorkFlowStepDialog" header="#{i18n.form_wf_step}"
+				widgetVar="newWorkFlowStepDialog" closable="true" modal="true"
+				draggable="true" showEffect="clip" hideEffect="fade"
+				resizable="true">
+
+				<h:panelGrid columns="3">
+					<h:outputLabel value="#{i18n.form_wf_stepName}" for="wfStepName" />
+					<h:inputText id="wfStepName" value="#{formMetadataMgmtBean.newWorkflowStep.stepName}" 
+						validator="#{formMetadataMgmtBean.validateUniqueOfWorkFlowStepName}">
+						<f:validateRequired />
+					</h:inputText>
+					<h:message for="wfStepName" style="color:red;" />
+					
+					<h:outputLabel value="#{i18n.form_wf_stepSequenceNumber}" for="wfStepSequenceNumber" />
+					<h:inputText id="wfStepSequenceNumber" value="#{formMetadataMgmtBean.newWorkflowStep.stepSequenceNumber}"
+						validator="#{formMetadataMgmtBean.validateUniqueOfWorkFlowSequenceNumber}">
+						<f:validateRequired />
+					</h:inputText>
+					<h:message for="wfStepSequenceNumber" style="color:red;"/>
+					
+					<h:outputLabel value="#{i18n.form_wf_statusName}" for="wfStatusName" />
+					<h:inputText id="wfStatusName" value="#{formMetadataMgmtBean.newWorkflowStep.statusName}"
+						validator="#{formMetadataMgmtBean.validateUniqueOfWorkFlowStatusName}">
+						<f:validateRequired />
+					</h:inputText>
+					<h:message for="wfStatusName" style="color:red;"/>
+					
+					<h:outputLabel value="#{i18n.form_wf_statusLabel}" for="wfStatusLabel" />
+					<h:inputText id="wfStatusLabel" value="#{formMetadataMgmtBean.newWorkflowStep.statusLabel}">
+						<f:validateRequired />
+					</h:inputText>
+					<h:message for="wfStatusLabel" style="color:red;"/>
+					
+					<h:outputLabel value="#{i18n.form_wf_assigneeAccount}" for="wfAssigneeAccount" />
+					<h:selectOneMenu id="wfAssigneeAccount"
+							value="#{formMetadataMgmtBean.newWorkflowStep.assigneeAccount}">
+						<f:selectItems value="#{systemAccountMgmt.allAccounts}" var="acct" itemLabel="#{acct.accountName}" itemValue="#{acct.account}"/>
+					</h:selectOneMenu>
+					<h:message for="wfAssigneeAccount" style="color:red;"/>
+					
+					<!-- 
+					<h:outputLabel value="#{i18n.form_wf_assigneeRole}" for="wfAssigneeRole" />
+					<h:selectOneMenu id="wfAssigneeRole" value="#{formMetadataMgmtBean.newWorkflowStep.assigneeRole}">
+						<f:selectItem itemLabel="#{i18n.pleaseSelectOne}"/>
+						<f:selectItems id="rolesItems" value="#{selectionItems.roles}" />
+					</h:selectOneMenu>
+					<h:message for="wfAssigneeRole" style="color:red;"/>
+					 -->
+					 				
+					<h:outputLabel value="#{i18n.form_wf_approveToStepName}" for="wfApproveToStepName" />
+					<h:selectOneMenu id="wfApproveToStepName" value="#{formMetadataMgmtBean.newWorkflowStep.approveToStepName}"
+						validator="#{formMetadataMgmtBean.validatorToStepName}">
+						<f:selectItem itemLabel="#{i18n.pleaseSelectOne}"/>
+						<f:selectItems value="#{formMetadataMgmtBean.workFlowSteps}" var="step" itemLabel="#{step.stepName}" itemValue="#{step.stepName}"/>
+					</h:selectOneMenu>
+					<h:message for="wfApproveToStepName" style="color:red;"/>
+					
+					<h:outputLabel value="#{i18n.form_wf_rejectToStepName}" for="wfRejectToStepName" />
+					<h:selectOneMenu id="wfRejectToStepName" value="#{formMetadataMgmtBean.newWorkflowStep.rejectToStepName}"
+						validator="#{formMetadataMgmtBean.validatorToStepName}">
+						<f:selectItem itemLabel="#{i18n.pleaseSelectOne}"/>
+						<f:selectItems value="#{formMetadataMgmtBean.workFlowSteps}" var="step" itemLabel="#{step.stepName}" itemValue="#{step.stepName}"/>
+					</h:selectOneMenu>
+					<h:message for="wfRejectToStepName" style="color:red;"/>
+				</h:panelGrid>
+
+				<h:commandButton id="saveWorkFlowStepButton" value="#{i18n.save}"
+					action="#{formMetadataMgmtBean.saveWorkFlowStep}">
+					<f:ajax render="formWorkFlowSteps newWorkFlowStepDialog"
+						execute="wfStepName wfStepSequenceNumber wfStatusName wfStatusLabel wfAssigneeAccount wfApproveToStepName wfRejectToStepName" />
+				</h:commandButton>
+				<h:message for="saveWorkFlowStepButton" style="color:red;" />
+			</ace:dialog>
+</ui:fragment>

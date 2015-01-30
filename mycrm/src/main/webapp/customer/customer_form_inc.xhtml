@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ice="http://www.icesoft.com/icefaces/component"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:icecore="http://www.icefaces.org/icefaces/core">
+
+	<ace:panel header="#{i18n.customerPanel}"
+		toggleable="#{editable eq 'false'}">
+		<h:panelGrid columns="2">
+			<c:if test="#{editable eq 'false'}">
+				<h:outputLabel value="#{i18n.customerId}" for="customerCustomerId" />
+				<h:panelGroup>
+					<h:inputText id="customerCustomerId" value="#{customer.customerId}"
+						readonly="true" />
+					<h:link outcome="customer_form.jsf?id=#{customer.id}"
+						value="#{i18n.edit}" target="_self" style="padding-left: 5px;" 
+						rendered="#{not empty appSessionParams.permissions['CUSTOMER_EDIT']}" />
+				</h:panelGroup>
+			</c:if>
+
+			<h:outputLabel value="#{i18n.name}" for="customerName" />
+			<h:panelGroup>
+				<h:inputText id="customerName" value="#{customer.name}"
+					readonly="#{editable eq 'false'}" required="true"
+					requiredMessage="#{i18n.validationRequired}" size="100" title="#{i18n_help.customer_name}">
+					<f:validateRegex pattern="[^\s\p{Punct}]*" />
+				</h:inputText>
+			
+				<h:link outcome="customer_mgmt.jsf?id=#{customer.id}"
+						value="  #{i18n.management}" target="_self" rendered="#{editable eq 'true'}"  
+						style="padding-left: 5px;"/>
+				<br />
+				<h:message for="customerName" style="color:red;" />
+			</h:panelGroup>
+
+			<h:outputLabel value="#{i18n.distributor}" />
+			<h:selectOneRadio id="customerDistributor" value="#{customer.isDistributor}" readonly="#{editable eq 'false'}">
+				<f:selectItems value="#{selectionItems.customerOrDistributor}"/>
+			</h:selectOneRadio>
+
+			<h:outputLabel value="#{i18n.website}" for="customerWebsite" />
+			<h:panelGroup>
+				<h:inputText id="customerWebsite" value="#{customer.website}"
+					readonly="#{editable eq 'false'}" size="100" />
+				<br />
+				<h:message for="customerWebsite" style="color:red;" />
+			</h:panelGroup>
+		</h:panelGrid>
+
+		<h:panelGrid columns="2">
+			<h:outputLabel value="#{i18n.annualAvenue}"
+				for="customerAnnualAvenue" />
+			<h:panelGroup>
+				<h:inputText id="customerAnnualAvenue"
+					value="#{customer.annualAvenue}" readonly="#{editable eq 'false'}">
+						<f:validateRegex pattern="([0-9]+\.[0-9]+)|([0-9]+)" />
+				</h:inputText>
+				<br />
+				<h:message for="customerAnnualAvenue" style="color:red;" />
+			</h:panelGroup>
+		</h:panelGrid>
+
+		<h:panelGrid columns="8"> 
+			<h:outputLabel value="#{i18n.agent}" for="customerAgent" />
+			<c:choose>
+				<c:when test="#{(editable eq 'true') and (not empty appSessionParams.permissions['CUSTOMER_ASSIGN_TO'])}">
+					<h:selectOneMenu id="customerAgent"
+						value="#{customer.agentAccount}" >
+						<f:selectItem itemValue="na" itemLabel="#{i18n.pleaseSelectOne}" />
+						<f:selectItems
+							value="#{systemAccountMgmt.accountsWithRole['ROLE_DISTRIBUTOR']}"
+							var="acct" itemLabel="#{acct.accountName}"
+							itemValue="#{acct.account}" />
+					</h:selectOneMenu>
+				</c:when>
+				<c:otherwise>
+					<h:inputText id="customerAgent" value="#{customer.agentAccount}"
+							readonly="true" converter="accountToDisplayNameConverter" />
+				</c:otherwise>
+			</c:choose>
+			
+			<h:outputLabel value="#{i18n.salesAccount}"
+				for="customerSalesAccount" />
+			<c:choose>
+				<c:when test="#{(editable eq 'true') and (not empty appSessionParams.permissions['CUSTOMER_ASSIGN_TO'])}">
+					<h:selectOneMenu id="customerSalesAccount"
+						value="#{customer.salesAccount}" readonly="#{empty appSessionParams.permissions['CUSTOMER_ASSIGN_TO']}">
+						<f:selectItem itemValue="na" itemLabel="#{i18n.pleaseSelectOne}" />
+						<f:selectItems
+							value="#{systemAccountMgmt.accountsWithRole['ROLE_SALES']}"
+							var="acct" itemLabel="#{acct.accountName}"
+							itemValue="#{acct.account}" />
+					</h:selectOneMenu>
+				</c:when>
+				<c:otherwise>
+					<h:inputText id="customerSalesAccount"
+						value="#{customer.salesAccount}" readonly="true" converter="accountToDisplayNameConverter" />
+				</c:otherwise>
+			</c:choose>
+
+			<h:outputLabel value="#{i18n.outsideSales}"
+				for="customerOutsideSales" />
+			<c:choose>
+				<c:when test="#{(editable eq 'true') and (not empty appSessionParams.permissions['CUSTOMER_ASSIGN_TO'])}">
+					<h:selectOneMenu id="customerOutsideSales"
+						value="#{customer.outsideSalesAccount}" readonly="#{empty appSessionParams.permissions['CUSTOMER_ASSIGN_TO']}">
+						<f:selectItem itemValue="na" itemLabel="#{i18n.pleaseSelectOne}" />
+						<f:selectItems
+							value="#{systemAccountMgmt.accountsWithRole['ROLE_OUTSIDE_SALES']}"
+							var="acct" itemLabel="#{acct.accountName}"
+							itemValue="#{acct.account}" />
+					</h:selectOneMenu>
+				</c:when>
+				<c:otherwise>
+					<h:inputText id="customerOutsideSales"
+						value="#{customer.outsideSalesAccount}" readonly="true" converter="accountToDisplayNameConverter" />
+				</c:otherwise>
+			</c:choose>
+
+			<h:outputLabel value="#{i18n.CUSTOMER_SERVICE}" for="customerService" />
+			<c:choose>
+				<c:when test="#{(editable eq 'true') and (not empty appSessionParams.permissions['CUSTOMER_ASSIGN_TO'])}">
+					<h:selectOneMenu id="customerService"
+						value="#{customer.customerServiceAccount}" readonly="#{empty appSessionParams.permissions['CUSTOMER_ASSIGN_TO']}">
+						<f:selectItem itemValue="na" itemLabel="#{i18n.pleaseSelectOne}" />
+						<f:selectItems
+							value="#{systemAccountMgmt.accountsWithRole['ROLE_CUSTOMER_SERVICE']}"
+							var="acct" itemLabel="#{acct.accountName}"
+							itemValue="#{acct.account}" />
+					</h:selectOneMenu>
+				</c:when>
+				<c:otherwise>
+					<h:inputText id="customerService"
+						value="#{customer.customerServiceAccount}" readonly="true" converter="accountToDisplayNameConverter"/>
+				</c:otherwise>
+			</c:choose>
+		</h:panelGrid>
+
+		<h:panelGrid columns="6">
+			<h:outputLabel value="#{i18n.phone}1" for="customerPhone" />
+			<h:panelGroup>
+				<h:inputText id="customerPhone" value="#{customer.phone}"
+					readonly="#{editable eq 'false'}">
+					<f:validateRegex pattern="(\([0-9]{3}\)\-[0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8}\-[0-9]{3,4})" />
+				</h:inputText>
+				<br />
+				<h:message for="customerPhone" style="color:red;" />
+			</h:panelGroup>
+			
+			<h:outputLabel value="#{i18n.phone}2" for="customerPhone" />
+			<h:panelGroup>
+				<h:inputText id="customerPhone2" value="#{customer.phone2}"
+					readonly="#{editable eq 'false'}">
+					<f:validateRegex pattern="(\([0-9]{3}\)\-[0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8}\-[0-9]{3,4})" />
+				</h:inputText>
+				<br />
+				<h:message for="customerPhone2" style="color:red;" />
+			</h:panelGroup>
+			
+			<h:outputLabel value="#{i18n.phone}3" for="customerPhone" />
+			<h:panelGroup>
+				<h:inputText id="customerPhone3" value="#{customer.phone3}"
+					readonly="#{editable eq 'false'}">
+					<f:validateRegex pattern="(\([0-9]{3}\)\-[0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8}\-[0-9]{3,4})" />
+				</h:inputText>
+				<br />
+				<h:message for="customerPhone3" style="color:red;" />
+			</h:panelGroup>
+			
+			<h:outputLabel value="#{i18n.email}" for="customerEmail" />
+			<h:panelGroup>
+				<h:inputText id="customerEmail" value="#{customer.email}"
+					readonly="#{editable eq 'false'}">
+					<f:validateRegex pattern="[\w]+@[\w]+\.(com|cn|com\.cn)"/>
+				</h:inputText>
+				<br />
+				<h:message for="customerEmail" style="color:red;" />
+			</h:panelGroup>
+			
+			<h:outputLabel value="#{i18n.area}" for="customerArea" />
+			<h:inputText id="customerArea" value="#{customer.area}"
+				readonly="#{editable eq 'false'}" />
+
+			<h:outputLabel value="#{i18n.province}" for="customerProvince" />
+			<h:inputText id="customerProvince" value="#{customer.province}"
+				readonly="#{editable eq 'false'}" />
+
+			<h:outputLabel value="#{i18n.city}" for="customerCity" />
+			<h:inputText id="customerCity" value="#{customer.city}"
+				readonly="#{editable eq 'false'}" />
+				
+			<h:outputLabel value="#{i18n.fax1}" for="customerFax1" />
+			<h:panelGroup>
+				<h:inputText id="customerFax1" value="#{customer.fax1}"
+					readonly="#{editable eq 'false'}">
+					<f:validateRegex pattern="([0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8}\-[0-9]{3,4})" />
+				</h:inputText>
+				<br/>
+				<h:message for="customerFax1" style="color:red;" />
+			</h:panelGroup>
+
+			<h:outputLabel value="#{i18n.fax2}" for="customerFax2" />
+			<h:panelGroup>
+				<h:inputText id="customerFax2" value="#{customer.fax2}"
+					readonly="#{editable eq 'false'}">
+					<f:validateRegex pattern="([0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8}\-[0-9]{3,4})" />
+				</h:inputText>
+				<br/>
+				<h:message for="customerFax2" style="color:red;" />
+			</h:panelGroup>
+
+			<h:outputLabel value="#{i18n.fax3}" for="customerFax3" />
+			<h:panelGroup>
+				<h:inputText id="customerFax3" value="#{customer.fax3}"
+					readonly="#{editable eq 'false'}">
+					<f:validateRegex pattern="([0-9]{3,4}\-[0-9]{6,8})|([0-9]{3,4}\-[0-9]{6,8}\-[0-9]{3,4})" />
+				</h:inputText>
+				<br/>
+				<h:message for="customerFax3" style="color:red;" />
+			</h:panelGroup>
+			
+		</h:panelGrid>
+		<h:panelGrid columns="2">
+			<h:outputLabel value="#{i18n.address1}" for="customerAddress1" />
+			<h:panelGroup>
+				<h:inputText id="customerAddress1" value="#{customer.address1}"
+					readonly="#{editable eq 'false'}" size="100">
+					<f:validateRegex pattern="[^\s]*" />
+				</h:inputText>
+				<br/>
+				<h:message for="customerAddress1" style="color:red;" />
+			</h:panelGroup>
+
+			<h:outputLabel value="#{i18n.address2}" for="customerAddress2" />
+			<h:panelGroup>
+				<h:inputText id="customerAddress2" value="#{customer.address2}"
+				readonly="#{editable eq 'false'}" size="100">
+					<f:validateRegex pattern="[^\s]*" />
+				</h:inputText>
+				<br/>
+				<h:message for="customerAddress2" style="color:red;" />
+			</h:panelGroup>
+
+			<h:outputLabel value="#{i18n.address3}" for="customerAddress3" />
+			<h:panelGroup>
+				<h:inputText id="customerAddress3" value="#{customer.address3}"
+				readonly="#{editable eq 'false'}" size="100">
+					<f:validateRegex pattern="[^\s]*" />
+				</h:inputText>
+				<br/>
+				<h:message for="customerAddress3" style="color:red;" />
+			</h:panelGroup>
+		</h:panelGrid>
+
+		<h:panelGrid columns="4">
+			<h:outputLabel value="#{i18n.type}" for="customerType" />
+			<h:inputText id="customerType" value="#{customer.type}"
+				readonly="#{editable eq 'false'}" />
+
+			<h:outputLabel value="#{i18n.industry}" for="customerIndustry" />
+			<h:inputText id="customerIndustry" value="#{customer.industry}"
+				readonly="#{editable eq 'false'}" size="50"/>
+				
+			<h:outputLabel value="#{i18n.quality}" for="customerQuality" />
+			<h:selectOneMenu id="customerQuality" value="#{customer.quality}"
+				readonly="#{editable eq 'false'}">
+				<f:selectItem itemLabel="NA" itemValue="NA" />
+				<f:selectItems id="customerQualityItems"
+					value="#{selectionItems.customerQualityItems}" />
+			</h:selectOneMenu>			
+
+			<h:outputLabel value="#{i18n.hearFrom}" for="customerHearFrom" />
+			<h:selectOneMenu id="customerHearFrom" value="#{customer.hearFrom}"
+				readonly="#{editable eq 'false'}">
+				<f:selectItems id="customerHearFromItems"
+					value="#{selectionItems.customerHearFromItems}" />
+			</h:selectOneMenu>
+		</h:panelGrid>
+
+		<h:panelGrid columns="2">
+			<h:outputLabel value="#{i18n.additional_notes}" for="customerNotes" />
+			<h:inputTextarea id="customerNotes" value="#{customer.notes}"
+				readonly="#{editable eq 'false'}" cols="100" rows="5"/>
+		</h:panelGrid>
+	</ace:panel>
+</ui:fragment>

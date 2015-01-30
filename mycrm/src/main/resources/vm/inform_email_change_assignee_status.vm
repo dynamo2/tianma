@@ -1,0 +1,9 @@
+<html>
+	<b>状态提示通知</b><p />
+	<b>您有一条需要操作的业务数据，请及时处理</b><p />
+	<b>业务名：</b>$formName<br />
+	<b>简述：</b>$summary<br />
+	<b>当前状态：</b>$status<br />
+	<b>提交人：</b>$modifyRealName($modifyAccount)<br />
+	<b>提交时间：</b>$modifyTime<br />
+</html>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<html>
+<head></head>
+<body>
+	<center>
+		<form method="post" action="j_spring_security_check" name="login_form">
+			<table>
+				<tr>
+					<td>User Name</td>
+					<td><input type="text" name="j_username" />
+					</td>
+				</tr>
+				<tr>
+					<td>Password</td>
+					<td><input type="password" name="j_password" />
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit" name="submit_button"
+						value="Login" />
+					</td>
+				</tr>
+			</table>
+		</form>
+		<div>
+			<p style="color: red; font-weight: bold;">- Login failure:
+				unknown user name or bad password.</p>
+		</div>
+	</center>
+</body>
+</html>

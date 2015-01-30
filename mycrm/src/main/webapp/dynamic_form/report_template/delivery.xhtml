@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/blank_template.xhtml">
+
+	<ui:define name="main_block">
+		<f:metadata>
+			<f:viewParam name="formMetadataId"
+				value="#{formPrintMgmtBean.formMetadataId}" />
+			<f:viewParam name="formRecordId"
+				value="#{formPrintMgmtBean.formRecordId}" />
+		</f:metadata>
+
+		<h:panelGroup layout="block" style="margin:5px;">
+			<img src="../../company_logo.jpg" style="width: 100%; height: 100px;"/>
+			<center>
+				<h2>
+					<h:outputText value="#{formPrintMgmtBean.formMetadata.formLabel}" />
+				</h2>
+			</center>
+
+			<h:panelGroup layout="block"
+				style="border-bottom:2px solid #000000; padding: 4px;">
+				<h:outputLabel value="#{i18n.form_biz_id} : " for="form_biz_id" />
+				<h:outputText id="form_biz_id"
+					value="#{formPrintMgmtBean.formRecordValueMap['form_biz_id']}"
+					style="color: #0000E7" />
+
+				<h:outputLabel value="#{i18n.customer_name} : " for="customer_name" />
+				<h:outputText id="customer_name"
+					value="#{formPrintMgmtBean.formRecordValueMap['customer_id']}"
+					style="color: #0000E7" converter="customerNameAndIdConverter" />
+			</h:panelGroup>
+
+			<style>
+				label {font-size: 11pt}
+				
+				td {font-size: 11pt}
+			</style>
+
+			<h:panelGroup binding="#{formPrintMgmtBean.printContent}" />
+			
+			<table border="0" cellspacing="2px" width="98%">
+				<colgroup>
+					<col width="100px"/>
+					<col width="*"/>
+				</colgroup>
+				<tr>
+					<td><label>送货单位：</label></td>
+					<td>三门峡恒生科技研发有限公司</td>
+				</tr>
+				<tr>
+					<td><label>送货时间：</label></td>
+					<td><div style="width:400px; height: 50px; border-bottom: 1px solid #000000;">  </div></td>
+				</tr>
+				<tr>
+					<td><label>送货人签字：</label></td>
+					<td><div style="width:400px; height: 50px; border-bottom: 1px solid #000000;">  </div></td>
+				</tr>
+				<tr>
+					<td><label>验收单位：</label></td>
+					<td><div style="width:400px; height: 50px; border-bottom: 1px solid #000000;">  </div></td>
+				</tr>
+				<tr>
+					<td><label>验收时间：</label></td>
+					<td><div style="width:400px; height: 50px; border-bottom: 1px solid #000000;">  </div></td>
+				</tr>
+				<tr>
+					<td><label>验收人签字：</label></td>
+					<td><div style="width:400px; height: 50px; border-bottom: 1px solid #000000;">  </div></td>
+				</tr>
+			</table>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/blank_template.xhtml">
+
+	<ui:define name="main_block">
+		<f:metadata>
+			<f:viewParam name="formMetadataId"
+				value="#{formPrintMgmtBean.formMetadataId}" />
+			<f:viewParam name="formRecordId"
+				value="#{formPrintMgmtBean.formRecordId}" />
+		</f:metadata>
+
+		<h:panelGroup layout="block" style="margin:5px;">
+			<img src="../../Logo8.jpg" style="float: left; height: 150px;"/>
+			<img src="../../Logo7.jpg" style="float: right; height: 150px;"/>
+			<div style="clear: both; visibility: hidden;">clean</div>
+			<center>
+				<h2>
+					<h:outputText value="#{formPrintMgmtBean.formMetadata.formLabel}" />
+				</h2>
+			</center>
+
+			<h:panelGroup layout="block"
+				style="border-bottom:2px solid #000000; padding: 4px;">
+				<h:outputLabel value="#{i18n.form_biz_id} : " for="form_biz_id" />
+				<h:outputText id="form_biz_id"
+					value="#{formPrintMgmtBean.formRecordValueMap['form_biz_id']}"
+					style="color: #0000E7" />
+
+				<h:outputLabel value="#{i18n.customer_name} : " for="customer_name" />
+				<h:outputText id="customer_name"
+					value="#{formPrintMgmtBean.formRecordValueMap['customer_id']}"
+					style="color: #0000E7" converter="customerNameAndIdConverter" />
+			</h:panelGroup>
+
+			<h:panelGroup binding="#{formPrintMgmtBean.printContent}" />			
+
+			<table border="0" cellspacing="2px;" width="98%" style="margin-top: 30px;">
+				<colgroup>
+					<col width="75px"/>
+					<col width="*"/>
+				</colgroup>
+				<tr>
+					<td><label>规格/标准：</label></td>
+					<td>
+						<span style="margin-right: 20px;">100g/瓶</span>
+						<span style="margin-right: 20px;">含金量51%</span>
+						<span style="margin-right: 20px;">银Ag≤0.001%</span>
+						<span style="margin-right: 20px;">铜Cu≤0.0005%</span>
+						<span style="margin-right: 20px;">铅Pb≤0.0005%</span>
+					</td>
+				</tr>
+				<tr>
+					<td><label>包装：</label></td>
+					<td>
+						<div>外包装：邮政EMS包装盒</div>
+						<div>内包装：泡沫盒、塑料瓶</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label>交货方式：</label></td>
+					<td>款到发货</td>
+				</tr>
+				<tr>
+					<td><label>交货时间：</label></td>
+					<td>从发货之时起72小时内到达</td>
+				</tr>
+				<tr>
+					<td><label>费用承担：</label></td>
+					<td>供方通过邮政EMS方式送达，费用由供方承担如需加急发货，额外物流费用由买方承担</td>
+				</tr>
+			</table>
+
+			<div style="margin: 2px; width: 98%; border: 3px solid #000000; padding: 5px; margin-top: 30px;">
+				<p align="left">本人（本公司）已阅读并接受北京恒生金源科技发展有限公司（供方）《销售、服务和技术支持条款和条件》和/或《北京恒生金源专业服务条款和条件》，该有关条款和条件可以通过公司网站获得或向北京恒生金源索取。本人（本公司）进一步确认本人（本公司）已阅读并接受所有附于本报价单后的报价单描述，本人（本公司）签署、盖章并返回本单页的报价单将构成本人（本公司）
+					对于北京恒生金源提供的报价单描述的确认。本报价单包含之所有产品和服务将售至"收货地址"所述之最终目的地。</p>
+				<div style="width:100%; margin-top: 20px; text-align: right">
+					<span style="margin-right: 100px;">
+						<LABEL>客户签章:</LABEL>
+						<input type="text" size="30" style="border: 1px solid #ffffff; border-bottom:1px solid #000000"/>
+					</span>
+				</div>
+			</div>
+
+			<div style="margin: 2px; width: 98%; padding: 5px; margin-top: 30px; text-align: center">
+				<p>北京恒生金源科技发展有限公司</p>
+				<p>地址：北京西城区锦什坊街26号恒奥中心C座206 邮编：100032</p>
+				<p>电话：+86 10 66215816  传真：+86 10 66215836</p>
+			</div>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

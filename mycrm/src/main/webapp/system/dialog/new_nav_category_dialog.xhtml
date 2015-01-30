@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+             xmlns:h="http://java.sun.com/jsf/html"
+             xmlns:f="http://java.sun.com/jsf/core"
+             xmlns:c="http://java.sun.com/jsp/jstl/core"
+             xmlns:ace="http://www.icefaces.org/icefaces/components"
+             xmlns:ui="http://java.sun.com/jsf/facelets"
+             xmlns:customer="http://java.sun.com/jsf/composite/tags/customer">
+
+    <ace:dialog id="addNavCategoryFormDialog" header="添加导航分类" closable="true" modal="true"
+                draggable="true" showEffect="clip" hideEffect="fade" widgetVar="addNavCategoryFormDialog"
+                resizable="true" width="400" height="250" styleClass="dialog addNavCategoryFormDialog">
+
+        <script language="javaScript">
+            function ajaxEventEditNavCategory(event){
+                if (event.status == 'success') {
+                    var cid = $(".newNavCategoryId").val();
+                    $(".waitingCategoryId").val(cid);
+                    $(".waitingCategoryId").removeClass("waitingCategoryId");
+                }
+            }
+
+            function refreshLabel(cid){
+                $(".refreshCategoryLabelLink"+cid).text($(".newCategoryLabel").val());
+            }
+        </script>
+        <table class="form-table">
+            <tr>
+                <td class="td-label"><h:outputLabel value="导航分类名" for="newCategoryLabel" /></td>
+                <td class="td-input">
+                    <h:inputText id="newCategoryLabel" required="true" class="newCategoryLabel"
+                                 value="#{navMgmt.editNavCategory.label}"
+                                 requiredMessage="#{i18n.validationRequired}" />
+                    <h:message for="newCategoryLabel" style="color:red;"/>
+                </td>
+            </tr>
+            <tr>
+                <th class="td-input" colspan="2">
+                    <h:commandButton value="保存" action="#{navMgmt.saveEditNavCategory}"
+                                     onclick="saveNewCategory()" rendered="#{navMgmt.creatable}">
+                        <f:ajax execute="newCategoryLabel" onevent="ajaxEventEditNavCategory" render="newNavCategoryId navCategoryPanel" />
+                    </h:commandButton>
+                    <h:commandButton value="保存" action="#{navMgmt.saveEditNavCategory}"
+                                     onclick="refreshLabel(#{navMgmt.editNavCategory.id})"
+                                     rendered="#{navMgmt.editable}">
+                        <f:ajax execute="newCategoryLabel" render="navCategoryPanel" />
+                    </h:commandButton>
+                    <h:button value="取消" onclick="addNavCategoryFormDialog.hide();" />
+                </th>
+            </tr>
+        </table>
+    </ace:dialog>
+</ui:fragment>

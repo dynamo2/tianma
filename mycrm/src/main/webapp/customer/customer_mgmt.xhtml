@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:icecore="http://www.icefaces.org/icefaces/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+
+		<f:metadata>
+			<f:viewParam name="id" value="#{customerForm.customerId}" />
+			<f:viewParam name="id" value="#{orderMgmtBean.customerId}" />
+		</f:metadata>
+
+		<ui:include src="customer_form_inc.xhtml">
+			<ui:param name="customer" value="#{customerForm.customer}" />
+			<ui:param name="editable" value="false" />
+		</ui:include>
+		
+		<h:form id="customerMgmtForm">
+			<ui:include src="customer_relationshipGraph_inc.xhtml" />
+			<ui:include src="customer_service_inc.xhtml" />			
+		</h:form>
+
+		<ace:tabSet id="customerMgmtTabSet" clientSide="true">
+			<ace:tabPane label="#{i18n.contactsPanel}">
+				<h:form id="contactsForm">
+					<ace:dialog id="newContactDialog" header="#{i18n.newContactPanel}"
+						widgetVar="newContactDialog" closable="true" modal="true"
+						draggable="true" showEffect="clip" hideEffect="fade" resizable="true">
+
+						<h:panelGroup id="contactsInputForm">
+							<ui:include src="contact_form_inc.xhtml">
+								<ui:param name="contact" value="#{customerForm.newContact}" />
+								<ui:param name="editable" value="true" />
+							</ui:include>
+						</h:panelGroup>
+						<h:commandButton id="saveButton" value="#{i18n.save}"
+							action="#{customerForm.saveContact}">
+							<f:ajax render="contactsList contactsInputForm msg"
+								execute="contactsForm" />
+						</h:commandButton>
+						<h:message id="msg" for="saveButton" style="color:red;" />
+					</ace:dialog>
+
+					<ace:menuBar id="mainMenu">
+						<ace:menuItem value="#{i18n.newContactMenuItem}"
+							onclick="newContactDialog.show();"
+							icon="ui-icon ui-icon-document" 
+							rendered="#{not empty appSessionParams.permissions['CUSTOMER_NEW_CONTACT']}"/>
+					</ace:menuBar>
+
+					<h:message id="contactListMessages" for="contactsForm"/>
+
+					<ui:include src="contacts_list_inc.xhtml">
+						<ui:param name="contactsList" value="#{customerForm.contactsList}" />
+						<ui:param name="mgmtBean" value="#{customerForm}" />
+					</ui:include>
+
+				</h:form>
+			</ace:tabPane>
+			<ace:tabPane label="#{i18n.customerProfilePanel}">
+				<h:form id="customerProfileForm">
+					<ui:include src="customer_profile_inc.xhtml" />
+				</h:form>
+			</ace:tabPane>
+			<ace:tabPane label="#{i18n.notesPanel}" rendered="#{not empty appSessionParams.permissions['NOTES']}">
+				<h:form id="notesForm">
+					<ace:dialog id="newNotesDialog" header="#{i18n.notesPanel}"
+						widgetVar="newNotesDialog" closable="true" modal="true"
+						draggable="true" showEffect="clip" hideEffect="fade" resizable="true">
+
+						<h:panelGroup id="notesFormInc">
+							<ui:include src="/notes/note_form_inc.xhtml">
+								<ui:param name="note" value="#{customerForm.newNote}" />
+								<ui:param name="editable" value="true" />
+							</ui:include>
+						</h:panelGroup>
+
+						<h:commandButton value="#{i18n.save}"
+							action="#{customerForm.saveNote}">
+							<f:ajax render="notesList notesFormInc" execute="notesForm" />
+						</h:commandButton>
+					</ace:dialog>
+
+					<ace:menuBar id="mainMenu" rendered="#{not empty appSessionParams.permissions['NOTES_EDIT']}">
+						<ace:menuItem value="#{i18n.newNotesMenuItem}"
+							onclick="newNotesDialog.show();" icon="ui-icon ui-icon-document"/>
+					</ace:menuBar>
+
+					<ui:include src="/notes/notes_list_inc.xhtml">
+						<ui:param name="notesList" value="#{customerForm.notesList}" />
+					</ui:include>
+				</h:form>
+			</ace:tabPane>
+			<ace:tabPane label="#{i18n.todoPanel}" rendered="#{not appSessionParams.roleCustomerService}">
+				<h:form id="todoForm">
+					<ace:dialog id="newTodoDialog" header="#{i18n.todoPanel}"
+						widgetVar="newTodoDialog" closable="true" modal="true"
+						draggable="true" showEffect="clip" hideEffect="fade" resizable="true">
+
+						<h:panelGroup id="todoFormInc">
+							<ui:include src="/todo/todo_form_inc.xhtml">
+								<ui:param name="todo" value="#{customerForm.newTodo}" />
+								<ui:param name="editable" value="true" />
+							</ui:include>
+						</h:panelGroup>
+						<hr/>
+						<h:commandButton id="saveButton" value="#{i18n.save}"
+							action="#{customerForm.saveTodo}">
+							<f:ajax render="@form" execute="todoAssigneer todoPlanStart todoPlanEnd todoType todoDescription todoTitle" />
+						</h:commandButton>
+						<h:message id="msg" for="saveButton" style="color:red;" />
+					</ace:dialog>
+
+					<ace:menuBar id="mainMenu">
+						<ace:menuItem value="#{i18n.newTodoMenuItem}"
+							onclick="newTodoDialog.show();" icon="ui-icon ui-icon-document" 
+							rendered="#{not empty appSessionParams.permissions['TODO_NEW']}"/>
+					</ace:menuBar>
+
+					<ui:include src="/todo/todos_list_inc.xhtml">
+						<ui:param name="todosList" value="#{customerForm.todosList}" />
+						<ui:param name="customerForm" value="#{customerForm}" />
+					</ui:include>
+				</h:form>
+			</ace:tabPane>
+			
+			<c:if test="#{appSessionParams.roleSalesDirector and false}">
+				<ace:tabPane label="#{i18n.salesManagementPanel}">
+					<h:form id="salesManagementForm">
+						<div style="height: 300px; overflow: auto;">
+							<h:selectManyCheckbox value="#{customerForm.boundAccountsList}"
+								layout="pageDirection">
+								<f:selectItems value="#{systemAccountMgmt.allAccounts}"
+									var="account" itemValue="#{account.account}"
+									itemLabel="#{account.accountName}" />
+							</h:selectManyCheckbox>
+						</div>
+						<h:commandButton value="#{i18n.save}"
+							action="#{customerForm.saveAccountWithCustomer}">
+							<f:ajax execute="salesManagementForm"
+								render="saveAccountWithCustomerMsg" />
+						</h:commandButton>
+						<div>
+							<h:message for="salesManagementForm"
+								id="saveAccountWithCustomerMsg" showDetail="true"
+								showSummary="true" />
+						</div>
+					</h:form>
+				</ace:tabPane>
+			</c:if>
+
+			<ace:tabPane label="#{i18n.customerDocPanel}">
+				<h:form id="customerDocForm">
+					<h:link outcome="/inc/file_upload.jsf" value="#{i18n.fileupload}"
+						target="_self">
+						<f:param name="returnUrl"
+							value="/customer/customer_mgmt.jsf?id=#{customerForm.customer.id}" />
+						<f:param name="customerId"
+							value="#{customerForm.customer.id}" />
+						<f:param name="forType" value="CUSTOMER" />
+						<f:param name="forId" value="#{customerForm.customer.id}" />
+					</h:link>
+
+					<ace:dataTable id="fileList" value="#{customerForm.attachedFiles}"
+						var="f" emptyMessage="#{i18n.noData}">
+						<ace:column headerText="#{i18n.filename}">
+							<h:outputLink value="#{f.fileDownloadUrl}" target="_blank">
+								<h:outputText value="#{f.filename}" />
+							</h:outputLink>
+						</ace:column>
+
+						<ace:column headerText="#{i18n.comments}">
+							<h:outputText value="#{f.comments}" />
+						</ace:column>
+
+						<ace:column headerText="#{i18n.keywords}">
+							<h:outputText value="#{f.keywords}" />
+						</ace:column>
+
+						<ace:column headerText="#{i18n.created}">
+							<h:outputText value="#{f.created}" />
+						</ace:column>
+
+						<ace:column headerText="#{i18n.createdBy}">
+							<h:outputText value="#{f.createdBy}" />
+						</ace:column>
+					</ace:dataTable>
+				</h:form>
+			</ace:tabPane>		
+		</ace:tabSet>
+
+		<h:messages id="formMessage" showDetail="true" />
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,7 @@
+<html>
+	<b>客户信息更新通知</b><p />
+	<b>您有一条客户信息被更新，请及时查阅。</b><p />
+	<b>客户名：</b>$customerName<br />
+	<b>最后修改人：</b>$modifyRealName($modifyAccount)<br />
+	<b>最后修改时间：</b>$modifyTime<br />
+</html>

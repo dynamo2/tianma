@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ace:panel header="#{i18n.customerRelationshipGraphPanel}" toggleable="true">
+		<h:panelGroup layout="block" style="border-bottom: 1px solid #000000; padding-bottom: 5px;" 
+			rendered="#{not empty appSessionParams.permissions['CUSTOMER_CONNECT_TO_DISTRIBUTOR']}">
+			<h:outputLabel value="#{i18n.connect_to_distributor}" />
+			<h:selectOneMenu id="distributor_customer_id"
+				value="#{customerForm.currentCustomerConnectAsRight.leftCustomerId}">
+				<f:selectItem itemValue="0" itemLabel="#{i18n.pleaseSelectOne}" />
+				<f:selectItems value="#{customerForm.distributorList}"
+					var="distributor" itemLabel="#{distributor.name}"
+					itemValue="#{distributor.id}" />
+			</h:selectOneMenu>
+			<h:commandButton value="#{i18n.connect}"
+				action="#{customerForm.connectToDistributor}">
+				<f:ajax render="@form" execute="distributor_customer_id" />
+			</h:commandButton>
+		</h:panelGroup>
+		
+		<h:panelGroup rendered="#{not empty customerForm.onLeftCustomerList}">
+			<h:outputLabel value="#{i18n.distributor_list}" /><br/>
+			<ol>
+			<ui:repeat var="left" value="#{customerForm.onLeftCustomerList}">
+				<li>
+				<c:choose>
+					<c:when test="#{empty appSessionParams.permissions['CUSTOMER_EDIT']}">
+						<h:outputText value="#{left.leftCustomerId}" converter="customerNameAndIdConverter" />
+					</c:when>
+					<c:otherwise>
+						<h:link outcome="customer_mgmt.jsf?id=#{left.leftCustomerId}" target="_self" style="padding:2px;">
+							<h:outputText value="#{left.leftCustomerId}" converter="customerNameAndIdConverter" />
+						</h:link>
+						<h:commandButton value="#{i18n.disconnect}" action="#{customerForm.disconnect}" style="padding-left:5px;"
+							rendered="#{not empty appSessionParams.permissions['CUSTOMER_CONNECT_TO_DISTRIBUTOR']}">
+							<f:ajax render="@form" execute="@this"/>
+							<f:param name="relationshipId" value="#{left.id}"/>
+						</h:commandButton>
+					</c:otherwise>
+				</c:choose>
+				</li>
+			</ui:repeat>
+			</ol>
+		</h:panelGroup>
+		
+		<h:panelGroup rendered="#{not empty customerForm.onRightCustomerList}">
+			<h:outputLabel value="#{i18n.customer_list}" /><br />
+			<ol>
+			<ui:repeat var="right" value="#{customerForm.onRightCustomerList}">
+				<li>
+				<c:choose>
+					<c:when test="#{empty appSessionParams.permissions['CUSTOMER_EDIT']}">
+						<h:outputText value="#{right.rightCustomerId}" converter="customerNameAndIdConverter"/>
+					</c:when>
+					<c:otherwise>
+						<h:link outcome="customer_mgmt.jsf?id=#{right.rightCustomerId}" target="_self" style="padding:2px;">
+							<h:outputText value="#{right.rightCustomerId}" converter="customerNameAndIdConverter"/>
+						</h:link>
+						<h:commandButton value="#{i18n.disconnect}" action="#{customerForm.disconnect}" style="padding-left:5px;"
+											rendered="#{not empty appSessionParams.permissions['CUSTOMER_CONNECT_TO_DISTRIBUTOR']}">
+							<f:ajax render="@form" execute="@this"/>
+							<f:param name="relationshipId" value="#{right.id}"/>
+						</h:commandButton>
+					</c:otherwise>
+				</c:choose>
+				</li>
+			</ui:repeat>
+			</ol>
+		</h:panelGroup>
+	</ace:panel>
+</ui:fragment>

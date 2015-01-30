@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<h:panelGroup id="readonly_form_data" layout="block"
+		style="padding:5px; margin:5px;">
+		<ui:repeat var="group" value="#{groupedFields}">
+			<h:panelGroup layout="block"
+				style="border-top: 1px solid #000000; padding: 5px; margin: 0px;">
+				<ui:repeat var="row" value="#{group}">
+					<h:panelGroup layout="block" style="padding-bottom: 2px;">
+						<ui:repeat var="column" value="#{row}" varStatus="status">
+							<h:panelGroup>
+								<nobr>
+									<h:outputLabel value="#{column.fieldLabel} : " />
+									<h:outputText value="#{columnValueMap[column.columnName]}" />
+								</nobr>
+							</h:panelGroup>
+						</ui:repeat>
+					</h:panelGroup>
+				</ui:repeat>
+			</h:panelGroup>
+		</ui:repeat>
+	</h:panelGroup>
+</ui:fragment>

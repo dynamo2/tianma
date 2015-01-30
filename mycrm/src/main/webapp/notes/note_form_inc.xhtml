@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<h:panelGroup columns="2">
+		<h:outputLabel value="#{i18n.notes_for_role}" for="notesNotesForRole" />
+		<h:selectOneMenu id="notesNotesForRole" value="#{note.forRoleName}">
+			<f:selectItems value="#{appSessionParams.currentAccount.roleList}" var="role" itemLabel="#{roleMgmt.roleName2Label[role]}" itemValue="#{role}"/>
+		</h:selectOneMenu>
+	</h:panelGroup>
+	
+	<h:panelGrid columns="1">
+		<h:outputLabel value="#{i18n.notes}" for="notesNotes" />
+		<h:inputTextarea id="notesNotes" value="#{note.notes}"
+			readonly="#{editable eq 'false'}" rows="5" cols="100" required="true"
+			requiredMessage="#{i18n.validationRequired}">
+			<f:validateLength maximum="200" />
+		</h:inputTextarea>
+		<h:message for="notesNotes" style="color:red;" />
+	</h:panelGrid>
+
+
+</ui:fragment>

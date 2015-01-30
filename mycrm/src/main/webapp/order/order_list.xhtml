@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+	
+		<f:metadata>
+			<f:viewParam name="formMetadataId" value="#{orderListBean.formMetadataId}" />
+            <f:viewParam name="searchStatus" value="#{orderListBean.searchStatus}" />
+            <f:viewParam name="neStatus" value="#{orderListBean.neStatus}" />
+		</f:metadata>
+
+		<h:form id="orderListForm">
+			<ace:panel header="#{i18n.from_cfgFormName}">
+				<h:panelGroup layout="block">
+					<h:outputLabel value="#{i18n.from_cfgFormName}" for="formSelection" />
+					<h:selectOneMenu id="formSelection" value="#{orderListBean.formMetadataId}" >
+						<f:selectItem itemValue="0" itemLabel="#{i18n.pleaseSelectOne}"/>
+						<f:selectItems value="#{orderListBean.readableFormMetadataList}"
+							var="form" itemValue="#{form.id}" itemLabel="#{form.formLabel}" />
+						<f:ajax execute="formSelection" render="@form" listener="#{orderListBean.changeFormDatas}"/>
+					</h:selectOneMenu>
+					<h:outputText value=" | " rendered="#{orderListBean.creatable}" />
+					<h:link outcome="../order/new_order.jsf?formMetadataId=#{orderListBean.formMetadataId}"
+								value="#{i18n._new}" target="_self" rendered="#{orderListBean.creatable}" />
+
+                    <h:outputLabel value="#{i18n.summary}: " style="margin-left:30px;" />
+                    <h:inputText value="#{orderListBean.criterias.summary}" />
+                    <h:selectOneMenu id="searchStatusSelection" value="#{orderListBean.criterias.status}" >
+                        <f:selectItem itemValue="" itemLabel="#{i18n.pleaseSelectOne}-#{i18n.status}"/>
+                        <f:selectItems value="#{orderListBean.statusList}" />
+                    </h:selectOneMenu>
+                    <h:commandButton action="#{orderListBean.loadFormDatas}" value="#{i18n.search}">
+                        <f:ajax execute="@form" render="orderListTable"/>
+                    </h:commandButton>
+				</h:panelGroup>
+			</ace:panel>
+	
+			
+			<ace:dataTable id="orderListTable"
+				value="#{orderListBean.formDataList}" var="f" paginator="true"
+				paginatorPosition="bottom" rows="20" emptyMessage="#{i18n.noData}">
+				<ace:column headerText="#{i18n.customer_name}">
+					<h:outputText value="#{f.customerId}" converter="customerNameAndIdConverter"/>
+				</ace:column>
+				<ace:column headerText="#{i18n.summary}">
+					<h:outputText value="#{f.summary}" converter="customerNameAndIdConverter"/>
+				</ace:column>
+				<ace:column headerText="#{i18n.assignee}">
+					<nobr> <h:outputText value="#{f.assigneeAccount}" converter="accountToDisplayNameConverter"/> </nobr>
+				</ace:column>
+				<ace:column headerText="#{i18n.status}">
+					<nobr> <h:outputText value="#{f.status}" /> </nobr>
+				</ace:column>
+				<ace:column headerText="#{i18n.lastModified}">
+					<h:outputText value="#{f.lastModified}" />
+				</ace:column>
+				<ace:column headerText="#{i18n.lastModifiedBy}">
+					<h:outputText value="#{f.lastModifiedBy}"  converter="accountToDisplayNameConverter"/>
+				</ace:column>
+				<ace:column headerText="#{i18n.created}">
+					<h:outputText value="#{f.created}" />
+				</ace:column>
+				<ace:column headerText="#{i18n.createdBy}">
+					<nobr> <h:outputText value="#{f.createdBy}"  converter="accountToDisplayNameConverter"/> </nobr>
+				</ace:column>
+				<ace:column>
+					<nobr> <h:link outcome="new_order.jsf?id=#{f.id}"
+						value="#{i18n.management}" target="_self" />
+					</nobr>
+				</ace:column>
+			</ace:dataTable>
+			
+			
+			<h:messages id="formMessage" showDetail="true" />
+		</h:form>
+	</ui:define>
+
+</ui:composition>

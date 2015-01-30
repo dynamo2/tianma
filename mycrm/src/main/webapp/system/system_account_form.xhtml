@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ice="http://www.icesoft.com/icefaces/component"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<f:metadata>
+		<f:viewParam name="id" value="#{systemAccountForm.id}" />
+	</f:metadata>
+
+	<ui:define name="main_block">
+		<h:form id="systemAccountForm">	
+			<ace:menuBar id="menu">
+				<ace:menuItem value="#{i18n.save}"
+					icon="ui-icon ui-icon-disk" action="#{systemAccountForm.save}">
+					<ace:ajax onSuccess="alert('#{i18n.operationFinishedSuccessfully}');" />
+				</ace:menuItem>
+
+                <ace:menuItem value="#{i18n.reset_password}"
+                              action="#{accountForm.resetPassword}"
+                              rendered="#{appSessionParams.roleAdmin || appSessionParams.roleSalesDirector}">
+                    <f:ajax execute="@this" render="@none" onevent="checkAjaxStatus"/>
+                </ace:menuItem>
+			</ace:menuBar>
+			
+			<ui:include src="/inc/person_form_inc.xhtml">
+				<ui:param name="person" value="#{systemAccountForm.account.person}" />
+				<ui:param name="editable" value="true" />
+			</ui:include>
+			
+			<ui:include src="account_bean_form_inc.xhtml">
+				<ui:param name="account" value="#{systemAccountForm.account}" />
+				<ui:param name="accountForm" value="#{systemAccountForm}" />
+				<ui:param name="editable" value="true" />
+			</ui:include>
+			
+			<h:messages id="formMessage" showDetail="true" />
+		</h:form>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+		
+			<ace:dataTable id="formDataListTable"
+				value="#{dataList}" var="f" paginator="true"
+				paginatorPosition="bottom" rows="20" emptyMessage="#{i18n.noData}">
+				<ace:column headerText="#{i18n.form_biz_id}">
+					<h:outputText value="#{f.formBizId}" />
+				</ace:column>
+				<ace:column headerText="#{i18n.customer_name}">
+					<h:outputText value="#{f.customerId}" converter="customerNameAndIdConverter"/>
+				</ace:column>
+				<ace:column headerText="#{i18n.summary}">
+					<h:outputText value="#{f.summary}" converter="customerNameAndIdConverter"/>
+				</ace:column>
+				<ace:column headerText="#{i18n.assignee}">
+					<nobr> <h:outputText value="#{f.assigneeAccount}" /> </nobr>
+				</ace:column>
+				<ace:column headerText="#{i18n.status}">
+					<nobr> <h:outputText value="#{f.status}" /> </nobr>
+				</ace:column>
+				<ace:column headerText="#{i18n.lastModified}">
+					<h:outputText value="#{f.lastModified}">
+						<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+					</h:outputText>
+				</ace:column>
+				<ace:column headerText="#{i18n.lastModifiedBy}">
+					<h:outputText value="#{f.lastModifiedBy}" />
+				</ace:column>
+				<ace:column headerText="#{i18n.created}">
+					<h:outputText value="#{f.created}" >
+						<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+					</h:outputText>
+				</ace:column>
+				<ace:column headerText="#{i18n.createdBy}">
+					<nobr> <h:outputText value="#{f.createdBy}" /> </nobr>
+				</ace:column>
+				<ace:column>
+					<nobr> <h:link outcome="new_order.jsf?id=#{f.id}"
+						value="#{i18n.management}" target="_self" />
+					</nobr>
+				</ace:column>
+			</ace:dataTable>
+</ui:fragment>

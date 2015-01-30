@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ace:panel id="formWorkFlowStepPanel" header="#{i18n.form_wf_step}" rendered="#{formMetadataMgmtBean.formMetadata.id > 0}">
+				<ace:menuBar id="formWorkFlowStepNenu">
+					<ace:menuItem value="#{i18n._new}" icon="ui-icon ui-icon-document"
+						onclick="newWorkFlowStepDialog.show();" />
+				</ace:menuBar>
+
+				<ace:dataTable id="formWorkFlowSteps"
+					value="#{formMetadataMgmtBean.workFlowSteps}" var="wfStep"
+					emptyMessage="#{i18n.noData}">
+
+					<ace:column>
+						<h:outputText value="#{wfStep.stepSequenceNumber}" />
+					</ace:column>
+					<ace:column headerText="#{i18n.form_wf_stepName}">
+						<h:outputText value="#{wfStep.stepName}" />
+					</ace:column>
+					<ace:column headerText="#{i18n.form_wf_statusName}">
+						<h:outputText value="#{wfStep.statusName}" />
+					</ace:column>
+					<ace:column headerText="#{i18n.form_wf_statusLabel}">
+						<h:outputText value="#{wfStep.statusLabel}" />
+					</ace:column>
+					<ace:column headerText="#{i18n.form_wf_assigneeAccount}">
+						<h:outputText value="#{wfStep.assigneeAccount}" />
+					</ace:column>					
+					<ace:column headerText="#{i18n.form_wf_approveToStepName}">
+						<h:outputText value="#{wfStep.approveToStepName}" />
+					</ace:column>
+					<ace:column headerText="#{i18n.form_wf_rejectToStepName}">
+						<h:outputText value="#{wfStep.rejectToStepName}" />
+					</ace:column>					
+					<ace:column>
+						<h:panelGroup rendered="#{formMetadataMgmtBean.editable}">
+							<h:commandLink action="#{formMetadataMgmtBean.delWorkFlowStepById}"
+								onclick="return confirm('#{i18n.confirm}');"
+								value="#{i18n.delete}">
+								<f:ajax execute="@this" render="@this" />
+								<f:param name="stepId" value="#{wfStep.id}" />
+							</h:commandLink>
+							<h:outputText value=" | " />
+							<h:commandLink action="#{formMetadataMgmtBean.editWorkFlowStepById}"
+								value="#{i18n.edit}">
+								<f:ajax execute="@this" render="@form" onevent="ajaxEventFormConfigWorkFlowStepEdit"/>
+								<f:param name="stepId" value="#{wfStep.id}" />
+							</h:commandLink>
+						</h:panelGroup>
+					</ace:column>
+				</ace:dataTable>
+			</ace:panel>
+</ui:fragment>

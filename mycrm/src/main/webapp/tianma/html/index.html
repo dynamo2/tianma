@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html ng-app>
+    <head>
+        <script src="../js/angular.min.js"></script>
+        <script src="script.js"></script>
+    </head>
+    <body>
+		<ul ng-controller="objectMetadataController">
+			<li ng-repeat="d in datas">{{d.name}}&nbsp;&nbsp;{{d.uniqueMark}}&nbsp;&nbsp;</li>
+		</ul>
+    </body>
+</html>

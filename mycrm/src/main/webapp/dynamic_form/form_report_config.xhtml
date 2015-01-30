@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+			
+		<f:metadata>
+			<f:viewParam name="formMetadataId" value="#{dynamicFormReportDefinitionMgmtBean.formMetadataId}" />
+			<f:viewParam name="reportDefinitionId" value="#{dynamicFormReportDefinitionMgmtBean.reportDefinitionId}" />
+		</f:metadata>
+		
+		<h:form id="dynamicFormReportConfigForm">
+		
+			<ace:menuBar id="menu">
+				<ace:menuItem id="save_report" value="#{i18n.save}"
+					icon="ui-icon ui-icon-disk" action="#{dynamicFormReportDefinitionMgmtBean.saveReport}">
+					<ace:ajax execute="@form" render="@form" />
+				</ace:menuItem>
+			</ace:menuBar>
+			
+			<h:message for="dynamicFormReportConfigForm" style="color:red;"/>
+			
+			<ace:panel header="#{i18n.report}">
+				<h:panelGrid columns="3">
+					<h:outputLabel for="form_label" value="#{i18n.report_for}" />
+					<h:outputText id="form_Label" value="#{dynamicFormReportDefinitionMgmtBean.formMetadata.formLabel}" />
+					<h:message for="form_Label" style="color:red;"/>
+					
+					<h:outputLabel for="reportLabel" value="#{i18n.report_label}" />
+					<h:inputText id="reportLabel" value="#{dynamicFormReportDefinitionMgmtBean.reportDefinition.reportLabel}" 
+						required="true" requiredMessage="#{i18n.validationRequired}"/>
+					<h:message for="reportLabel" style="color:red;"/>
+					
+					<h:outputLabel for="reportDescription" value="#{i18n.report_description}" />
+					<h:inputTextarea id="reportDescription" value="#{dynamicFormReportDefinitionMgmtBean.reportDefinition.reportDescription}" rows="4" cols="100" 
+						 required="true" requiredMessage="#{i18n.validationRequired}"/>
+					<h:message for="reportDescription" style="color:red;"/>
+				</h:panelGrid>
+			</ace:panel>
+					
+			<ace:panel header="#{i18n.report_selections}" toggleable="true" collapsed="true">
+				<h:panelGroup layout="block" style="overflow:auto; height: 400px;">
+					<h:panelGrid columns="3">
+						<h:panelGroup layout="block">
+							<h:selectManyCheckbox value="#{dynamicFormReportDefinitionMgmtBean.selectedFieldNameList}" layout="pageDirection">
+								<f:selectItems value="#{dynamicFormReportDefinitionMgmtBean.formFieldsInReport}" var="field" itemLabel="#{field.field.fieldLabel}" itemValue="#{field.field.fieldName}"/>
+							</h:selectManyCheckbox>
+						</h:panelGroup>
+						
+						<h:panelGroup layout="block">
+							<h:selectManyCheckbox value="#{dynamicFormReportDefinitionMgmtBean.selectedFixedColumnNameList}" 
+								layout="pageDirection">
+								<f:selectItems value="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnList}" var="fixedColumn" 
+									itemLabel="#{fixedColumn.columnLabel}" itemValue="#{fixedColumn.columnName}"/>
+							</h:selectManyCheckbox>	
+						</h:panelGroup>
+					</h:panelGrid>
+				</h:panelGroup>
+			</ace:panel>
+			
+			<ace:panel id="whereConditionCfgPanel" header="#{i18n.report_conditions}" toggleable="true" collapsed="true">
+				<h:panelGrid columns="2">
+					<h:panelGroup id="whereConditionFieldList" layout="block" style="border-right:1px solid #000000; padding:4px; height: 400px; overflow: auto;">
+						<ui:repeat var="fieldInReport" value="#{dynamicFormReportDefinitionMgmtBean.formFieldsInReport}">
+							<h:panelGroup layout="block">
+								<h:commandLink value="#{fieldInReport.field.fieldLabel} : #{fieldInReport.field.fieldType}" action="#{dynamicFormReportDefinitionMgmtBean.loadCurrentField}">
+									<f:ajax execute="@this" render=":dynamicFormReportConfigForm:conditionConfigPanel" />
+									<f:param value="#{fieldInReport.field.fieldName}" name="fieldName"/>
+								</h:commandLink>
+								<h:outputText value=" # "  rendered="#{fieldInReport.inWhere}" style="color:red;"/>
+							</h:panelGroup>
+						</ui:repeat>
+					</h:panelGroup>
+					
+					<h:panelGroup id="conditionConfigPanel" layout="block">
+						
+						<ace:dialog id="newConditionDialog" header="#{i18n.report_condition}"
+							widgetVar="newConditionDialog" closable="true" modal="true"
+							draggable="true" showEffect="clip" hideEffect="fade" resizable="true">
+							
+							<h:panelGroup layout="block"
+								rendered="#{not empty dynamicFormReportDefinitionMgmtBean.currentFieldCondition}">
+								
+								<h:outputLabel value="#{i18n.report_condition_operator}" />
+								<h:selectOneMenu id="condOperation" value="#{dynamicFormReportDefinitionMgmtBean.currentFieldCondition.op}">
+									<f:selectItem itemLabel="=" itemValue="="/>
+									<f:selectItem itemLabel=">" itemValue=">"/>
+									<f:selectItem itemLabel="&lt;" itemValue="&lt;"/>
+									<f:selectItem itemLabel="&lt;>" itemValue="&lt;>"/>
+								</h:selectOneMenu>
+								
+								<h:outputLabel value="#{i18n.report_condition_value}" />
+								<h:panelGroup rendered="#{dynamicFormReportDefinitionMgmtBean.currentFieldInReport.field.fieldType ne 'datetime'}">
+									<h:inputText size="100" id="condValue1" value="#{dynamicFormReportDefinitionMgmtBean.currentFieldCondition.value}" />
+								</h:panelGroup>
+								<h:panelGroup rendered="#{dynamicFormReportDefinitionMgmtBean.currentFieldInReport.field.fieldType eq 'datetime'}">
+									<h:selectOneMenu id="condDateValue1" value="#{dynamicFormReportDefinitionMgmtBean.currentFieldCondition.value}">
+										<f:selectItem itemLabel="#{i18n.report_condition_date_today}" itemValue="today"/>
+										<f:selectItem itemLabel="#{i18n.report_condition_date_this_week}" itemValue="this_week"/>
+										<f:selectItem itemLabel="#{i18n.report_condition_date_this_month}" itemValue="this_month"/>
+										<f:selectItem itemLabel="#{i18n.report_condition_date_this_year}" itemValue="this_year"/>
+									</h:selectOneMenu>
+								</h:panelGroup>
+																	
+								<h:commandButton action="#{dynamicFormReportDefinitionMgmtBean.saveConditionForCurrentField}" value="#{i18n.save}">
+									<f:ajax execute="condOperation condValue1 condDateValue1" render="conditionListTable" 
+										onevent="ajaxEventFormReportConfig_closeConditionEditDialog"/>
+								</h:commandButton>
+								
+							</h:panelGroup>
+						</ace:dialog>
+						
+						<ace:dialog id="newDateRangeConditionDialog" header="#{i18n.report_condition_date_range}"
+							widgetVar="newDateRangeConditionDialog" closable="true" modal="true"
+							draggable="true" showEffect="clip" hideEffect="fade" resizable="true">
+							
+							<h:panelGroup layout="block"
+								rendered="#{not empty dynamicFormReportDefinitionMgmtBean.currentFieldCondition}">
+								
+								<h:panelGrid columns="2">
+									<h:outputLabel value="#{i18n.report_condition_start_date}" />
+									<ace:dateTimeEntry id="dateRangeConditionStartDate" renderAsPopup="true"
+										value="#{dynamicFormReportDefinitionMgmtBean.currentFieldCondition.startDate}" 
+										pattern="yyyy-MM-dd HH:mm"  
+										timeZone="#{appSessionParams.timezone}"
+										locale="#{appSessionParams.locale}"/>
+
+									<h:outputLabel value="#{i18n.report_condition_end_date}" />
+									<ace:dateTimeEntry id="dateRangeConditionEndDate" renderAsPopup="true"
+										value="#{dynamicFormReportDefinitionMgmtBean.currentFieldCondition.endDate}" 
+										pattern="yyyy-MM-dd HH:mm"  
+										timeZone="#{appSessionParams.timezone}"
+										locale="#{appSessionParams.locale}"/>
+								</h:panelGrid>	
+																	
+								<h:commandButton action="#{dynamicFormReportDefinitionMgmtBean.saveConditionForCurrentField}" value="#{i18n.save}">
+									<f:ajax execute="dateRangeConditionStartDate dateRangeConditionEndDate" render="conditionListTable" 
+										onevent="ajaxEventFormReportConfig_closeDateRangeConditionEditDialog"/>
+								</h:commandButton>
+								
+							</h:panelGroup>
+						</ace:dialog>
+						
+						
+						<h:panelGroup layout="block" rendered="#{not empty dynamicFormReportDefinitionMgmtBean.currentFieldInReport}">
+							<h:panelGroup layout="block" style="margin: 10px;">
+								<h:outputLabel value="#{dynamicFormReportDefinitionMgmtBean.currentFieldInReport.field.fieldLabel}" style="margin-right:10px;"/>
+							</h:panelGroup>
+							
+							<ace:dataTable id="conditionListTable"
+								value="#{dynamicFormReportDefinitionMgmtBean.currentFieldInReport.conditionList}" var="cond" emptyMessage="#{i18n.noData}"
+								rowIndexVar="condIndex">
+								
+								<ace:column headerText="#{i18n.report_condition_operator}">
+									<h:outputText value="#{cond.op}" rendered="#{not empty cond.op}"/>
+								</ace:column>
+								
+								<ace:column headerText="#{i18n.report_condition_value}">
+									<h:outputText value="#{cond.value}" rendered="#{not empty cond.value}"/>
+								
+									<h:panelGroup layout="block" rendered="#{not empty cond.startDate}">	
+										<h:outputText value="#{cond.startDate}">
+											<f:convertDateTime type="both" 
+												timeZone="#{appSessionParams.timezone}" 
+												locale="#{appSessionParams.locale}"/>
+										</h:outputText>
+										<h:outputText value=" ~ " />
+										<h:outputText value="#{cond.endDate}">
+											<f:convertDateTime type="both" 
+												timeZone="#{appSessionParams.timezone}" 
+												locale="#{appSessionParams.locale}"/>
+										</h:outputText>
+									</h:panelGroup>
+								</ace:column>
+								
+								<ace:column>
+									<nobr>
+										<h:commandLink action="#{dynamicFormReportDefinitionMgmtBean.loadConditionForCurrentFieldByIndex}" 
+											value="#{i18n.edit}" rendered="#{cond.dateRangeCondition}">
+											<f:ajax execute="@this" 
+												render=":dynamicFormReportConfigForm:newDateRangeConditionDialog" 
+												onevent="ajaxEventFormReportConfig_showDateRangeConditionEditDialog"/>
+											<f:param name="conditionIndex" value="#{condIndex}" />
+										</h:commandLink>
+										<h:commandLink action="#{dynamicFormReportDefinitionMgmtBean.loadConditionForCurrentFieldByIndex}" 
+											value="#{i18n.edit}" rendered="#{not cond.dateRangeCondition}">
+											<f:ajax execute="@this" render=":dynamicFormReportConfigForm:newConditionDialog" onevent="ajaxEventFormReportConfig_showConditionEditDialog"/>
+											<f:param name="conditionIndex" value="#{condIndex}" />
+										</h:commandLink>
+										<h:outputText value=" | " />
+										<h:commandLink action="#{dynamicFormReportDefinitionMgmtBean.removeConditionForCurrentFieldByIndex}" value="#{i18n.delete}">
+											<f:ajax execute="@this" render=":dynamicFormReportConfigForm:conditionConfigPanel"/>
+											<f:param name="conditionIndex" value="#{condIndex}" />
+										</h:commandLink>  
+									</nobr>
+								</ace:column>
+							</ace:dataTable>
+							
+							<h:panelGroup layout="block">
+								<h:commandButton action="#{dynamicFormReportDefinitionMgmtBean.newConditionForCurrentField()}" value="#{i18n._new}" style="margin-left:10px;">
+									<f:ajax execute="@this" render=":dynamicFormReportConfigForm:newConditionDialog" onevent="ajaxEventFormReportConfig_showConditionEditDialog"/>
+								</h:commandButton>
+								
+								<h:commandButton action="#{dynamicFormReportDefinitionMgmtBean.newDateRangeConditionForCurrentField()}" 
+									value="#{i18n.report_condition_date_range}" style="margin-left:10px;" 
+									rendered="#{dynamicFormReportDefinitionMgmtBean.currentFieldInReport.field.fieldType eq 'datetime'}">
+									<f:ajax execute="@this" render=":dynamicFormReportConfigForm:newDateRangeConditionDialog" 
+										onevent="ajaxEventFormReportConfig_showDateRangeConditionEditDialog"/>
+								</h:commandButton>
+							</h:panelGroup>												
+						</h:panelGroup>
+					</h:panelGroup>
+				</h:panelGrid>
+			</ace:panel>	
+			
+			<ace:panel header="#{i18n.report_condition_fixed_field}" toggleable="true" collapsed="true">
+				<h:panelGrid columns="3">
+					<c:forEach var="fixedColumnName" items="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnNameList}">
+						<h:outputLabel value="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].columnLabel}" />
+						<h:selectOneMenu value="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].condition.op}">
+							<f:selectItem itemLabel="=" itemValue="="/>
+							<f:selectItem itemLabel=">" itemValue=">"/>
+							<f:selectItem itemLabel="&lt;" itemValue="&lt;"/>
+							<f:selectItem itemLabel="&lt;>" itemValue="&lt;>"/>
+						</h:selectOneMenu>
+						<c:choose>
+							<c:when test="#{not empty dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].whereOptions}">
+								<h:selectOneMenu value="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].condition.value}">
+									<f:selectItem itemLabel="#{i18n.pleaseSelectOne}" itemValue=" "/>
+									<f:selectItems value="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].whereOptions}"/>
+								</h:selectOneMenu>
+							</c:when>
+							<c:when test="#{fixedColumnName eq 'customer_id'}">
+								<h:inputText size="100" value="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].condition.value}" 
+									converter="customerNameAndIdConverter"/>
+							</c:when>
+							<c:otherwise>
+								<c:choose>
+									<c:when test="#{not dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].dateTypedColumn}">
+										<h:inputText size="100" value="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].condition.value}" />
+									</c:when>
+									<c:otherwise>
+										<h:selectOneMenu value="#{dynamicFormReportDefinitionMgmtBean.formFixedColumnMapByColumnName[fixedColumnName].condition.value}">
+											<f:selectItem itemLabel="#{i18n.pleaseSelectOne}" itemValue=" "/>
+											<f:selectItem itemLabel="#{i18n.report_condition_date_today}" itemValue="today"/>
+											<f:selectItem itemLabel="#{i18n.report_condition_date_this_week}" itemValue="this_week"/>
+											<f:selectItem itemLabel="#{i18n.report_condition_date_this_month}" itemValue="this_month"/>
+											<f:selectItem itemLabel="#{i18n.report_condition_date_this_year}" itemValue="this_year"/>
+										</h:selectOneMenu>
+									</c:otherwise>
+								</c:choose>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</h:panelGrid>
+			</ace:panel>		
+		</h:form>
+	</ui:define>
+
+</ui:composition>

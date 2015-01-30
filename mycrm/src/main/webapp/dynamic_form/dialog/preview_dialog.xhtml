@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+             xmlns:h="http://java.sun.com/jsf/html"
+             xmlns:f="http://java.sun.com/jsf/core"
+             xmlns:c="http://java.sun.com/jsp/jstl/core"
+             xmlns:ace="http://www.icefaces.org/icefaces/components"
+             xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <ace:dialog id="previewDialog" header="#{i18n.formPreview}-#{formMetadataMgmtBean.formMetadata.formLabel}"
+                widgetVar="previewDialog" closable="true" modal="true"
+                draggable="true" showEffect="clip" hideEffect="fade"
+                resizable="true">
+
+        <ui:include src="/inc/order_form_inc.xhtml">
+            <ui:param name="formMetadata" value="#{formMetadataMgmtBean.formMetadata}" />
+            <ui:param name="groupView" value="#{formMetadataMgmtBean.groupView}" />
+            <ui:param name="columnValueMap" value="#{formMetadataMgmtBean.columnValueMap}" />
+        </ui:include>
+    </ace:dialog>
+</ui:fragment>

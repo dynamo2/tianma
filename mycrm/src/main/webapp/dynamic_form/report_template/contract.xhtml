@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+                xmlns:ace="http://www.icefaces.org/icefaces/components"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layout/blank_template.xhtml">
+
+    <ui:define name="main_block">
+
+        <style>
+            .head-div{
+                clear:both;
+                font-weight:800;
+                font-size:30px;
+                text-align:center;
+                width:100%;
+                padding:20px;
+                letter-spacing:20px;
+            }
+
+            table td,th{
+                font-size:10pt;
+            }
+            .head-table{
+                width:98%;
+                border:0px;
+            }
+            .head-table th {
+                width:75px;
+            }
+
+            .head-table td {
+                width:43%;
+            }
+
+            .detail-table{
+                width:98%;
+                border:0px;
+                margin-top:30px;
+            }
+            .detail-table th{
+                width:20px;
+                align:right;
+                vertical-align:top;
+            }
+
+            .goods-table {
+                width:90%;
+                background-color:#000000;
+                border:1px;
+            }
+
+            .goods-table th,td{
+                background-color:#FFFFFF;
+                padding:5px;
+            }
+
+            .goods-table .center{
+                text-align:center;
+                width:20px;
+            }
+
+            .foot-table {
+                border:0px;
+                width:98%;
+                margin-top:50px;
+                margin-bottom:100px;
+            }
+
+            .foot-ta
+
+            ble th{
+                width:50%;
+                padding-left:100px;
+                font-size:16px;
+                text-align:left;
+            }
+        </style>
+        <div>
+        <center>
+        <div layout="block" style="margin:5px;width:800px;">
+            <img src="../../icons/logo_contract.jpg" style="height:150px;" />
+            <div class="head-div">购货合同</div>
+
+            <table cellspacing="0" class="head-table">
+                <tr>
+                    <th>供方:</th>
+                    <td>三门峡恒生科技研发有限公司</td>
+                    <th>合同号:</th>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>需方:</th>
+                    <td></td>
+                    <th>日期:</th>
+                    <td></td>
+                </tr>
+            </table>
+
+            <table cellspacing="0" class="detail-table">
+                <tr>
+                    <th>一、</th>
+                    <td>货物名称、规格、数量及金额</td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td>
+                        <table class="goods-table" cellspacing="1" border="0">
+                            <tr>
+                                <th style="width:120px;">品名</th>
+                                <th>规格/标准</th>
+                                <th class="center">单位</th>
+                                <th class="center">数量</th>
+                                <th class="center">单价</th>
+                                <th class="center">金额</th>
+                            </tr>
+                            <tr>
+                                <td>一水合柠檬酸一钾二（丙二腈合金（Ⅰ））</td>
+                                <td>100g/瓶<br />
+                                    含金量51g%<br />
+                                    银Ag≤0.001%<br />
+                                    铜Cu≤0.0005%<br />
+                                    铅Pb≤0.0005%</td>
+                                <td class="center">瓶</td>
+                                <td class="center">10</td>
+                                <td class="center">12元</td>
+                                <td class="center">120元</td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="6">货款共计人民币（大写）：</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <th>二、</th>
+                    <td>包装：外包装；纸箱包装盒。     内包装；泡沫盒、塑料瓶</td>
+                </tr>
+                <tr>
+                    <th>三、</th>
+                    <td>交货时间：款到后两日内发货,此价格含税！</td>
+                </tr>
+                <tr>
+                    <th>四、</th>
+                    <td>交货方式、地点、费用负担：双方协商送货方式，可通过快递方式送达或送货，费用按送货方式承担</td>
+                </tr>
+                <tr>
+                    <th>五、</th>
+                    <td>货款结算方式：款到发货。</td>
+                </tr>
+                <tr>
+                    <th>六、</th>
+                    <td>产品质量：应符合Q/4112BA013-2006标准</td>
+                </tr>
+                <tr>
+                    <th>七、</th>
+                    <td>违约责任：供需双方必须遵守重合同守信用的原则，定购单确认后，供方不能在双方商定的时间内交货、需方中途退货的，应向对方偿还不能交货或退货部分货款＿＿%的违约金</td>
+                </tr>
+                <tr>
+                    <th>八、</th>
+                    <td><b>解决合同纠纷方式：</b>双方协商或调解不成时由供方所在地法院裁决</td>
+                </tr>
+                <tr>
+                    <th>九、</th>
+                    <td><b>其它约定事项：</b>供方未收到需方货款而延误发货所造成的损失供方不承担责任，合同签订后双方不得擅自更改，发货前货款必须付清。</td>
+                </tr>
+                <tr>
+                    <th>十、</th>
+                    <td><b>计价方法：</b>以双方协商确认的报价订购单为准（传真件有效）</td>
+                </tr>
+            </table>
+
+            <table cellspacing="2px;" class="foot-table">
+                <tr>
+                    <th>供方</th>
+                    <th>需方</th>
+                </tr>
+                <tr>
+                    <td>单位名称（章）：三门峡恒生科技研发有限公司</td>
+                    <td>单位名称（章）：</td>
+                </tr>
+                <tr>
+                    <td>单位地址：三门峡开发区分陕路西、砥柱路北</td>
+                    <td>单位地址：</td>
+                </tr>
+                <tr>
+                    <td>代表人：</td>
+                    <td>代表人：</td>
+                </tr>
+                <tr>
+                    <td>电话：0398-2898665   传真：0398—2894188</td>
+                    <td>电话：   传真：</td>
+                </tr>
+                <tr>
+                    <td>开户银行：中国银行三门峡分行营业部</td>
+                    <td>开户银行：</td>
+                </tr>
+                <tr>
+                    <td>帐号：253311915266</td>
+                    <td>帐号：</td>
+                </tr>
+                <tr>
+                    <td>纳税人登记号：411200749215652</td>
+                    <td>纳税人登记号：</td>
+                </tr>
+            </table>
+        </div>
+        </center>
+        </div>
+    </ui:define>
+</ui:composition>

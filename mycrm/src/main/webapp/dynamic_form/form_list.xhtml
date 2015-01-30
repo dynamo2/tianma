@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+		<h:form id="formListForm">
+			<ace:dataTable id="formListDataTable"
+				value="#{formMetadataMgmtBean.formMetadataList}" var="formMetadata" paginator="true"
+				paginatorPosition="bottom" rows="20" emptyMessage="#{i18n.noData}">
+				<ace:column headerText="#{i18n.form_formLabel}">
+					<h:outputText value="#{formMetadata.formLabel} - (#{formMetadata.formName})" />
+				</ace:column>
+				<ace:column headerText="#{i18n.status}">
+					<h:outputText value="#{formMetadata.formStatus}" converter="tokenToLabelConverter" />
+				</ace:column>
+				<ace:column headerText="#{i18n.language}">
+					<h:outputText value="#{formMetadata.formLanguage}" converter="tokenToLabelConverter" />
+				</ace:column>
+				<ace:column>
+					<h:link outcome="form_config.jsf?id=#{formMetadata.id}"
+						value="#{i18n.edit}" target="_self" />
+				</ace:column>
+			</ace:dataTable>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

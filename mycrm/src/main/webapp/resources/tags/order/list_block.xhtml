@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ace="http://www.icefaces.org/icefaces/components"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:composite="http://java.sun.com/jsf/composite">
+
+<composite:interface>
+    <composite:attribute name="order" />
+</composite:interface>
+
+<composite:implementation>
+
+    <ace:panel toggleable="true" id="orderListViewPanel#{cc.attrs.order.formMetadata.id}" styleClass="orderBlockPanelClass#{cc.attrs.order.formMetadata.id}"
+               style="width:600px;height:200px;float:left;margin-left:5px;border:0px;">
+        <f:facet name="header">
+            <h:commandLink value="#{i18n.refresh}" action="#{cc.attrs.order.refresh}"
+                           styleClass="orderBlockRefreshLink#{cc.attrs.order.formMetadata.id}" style="margin-left:5px;">
+                <f:ajax execute="@this" render="orderListTable_#{cc.attrs.order.formMetadata.id}">
+                    <f:param name="formMetadataId" value="#{cc.attrs.order.formMetadata.id}" />
+                </f:ajax>
+            </h:commandLink>
+        </f:facet>
+
+        <ace:dataTable id="orderListTable_#{cc.attrs.order.formMetadata.id}" value="#{cc.attrs.order.formDatas}" var="f"
+                       paginatorPosition="bottom" rows="5">
+            <ace:column headerText="#{i18n.summary}">
+                <h:link outcome="order/new_order.jsf?id=#{f.id}" value="#{f.summary}" target="_self" />
+            </ace:column>
+            <ace:column headerText="#{i18n.status}">
+                <nobr> <h:outputText value="#{f.status}" /> </nobr>
+            </ace:column>
+        </ace:dataTable>
+    </ace:panel>
+
+    <script language="javaScript">
+        $('.orderBlockRefreshLink#{cc.attrs.order.formMetadata.id}').trigger('click');
+    </script>
+</composite:implementation>
+</html>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ui:include src="/inc/person_form_inc.xhtml">
+		<ui:param name="person" value="#{contact.person}" />
+		<ui:param name="editable" value="true" />
+	</ui:include>
+
+	<ace:panel header="#{i18n.contactPanel}">
+		<h:panelGrid columns="6">
+			<h:outputLabel value="#{i18n.title}" for="contactTitle" />
+			<h:inputText id="contactTitle" value="#{contact.title}"
+				readonly="#{editable eq 'false'}" />
+
+			<h:outputLabel value="#{i18n.type}" for="contactType" />
+			<h:selectOneMenu id="contactType" value="#{contact.type}"
+				readonly="#{editable eq 'false'}">
+				<f:selectItems id="contactTypeItems"
+					value="#{selectionItems.contactTypeItems}" />
+			</h:selectOneMenu>
+
+			<h:outputLabel value="#{i18n.notes}" for="contactNotes" />
+			<h:inputTextarea id="contactNotes" value="#{contact.notes}"
+				readonly="#{editable eq 'false'}" rows="3" cols="30" />
+		</h:panelGrid>
+	</ace:panel>
+
+</ui:fragment>

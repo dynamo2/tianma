@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	
+	<bean id="mailNotification" class="com.mfg.cn.discountmgmttool.backbean.MailNotificationBBean" init-method="init" lazy-init="false">
+		<property name="mailNotiList">
+			<map>
+				<entry key="N101">
+					<props>
+						<prop key="id">101</prop>
+						<prop key="title">Application was forwarded to GM</prop>
+						<prop key="action">Submit to GM|Submit to GM as acting director</prop>
+						<prop key="status">In process</prop>
+						<prop key="role">ROLE_GM</prop>
+						<prop key="region"></prop>
+					</props>
+				</entry>
+				<entry key="N102">
+					<props>
+						<prop key="id">102</prop>
+						<prop key="title">Application is waiting for director's approval</prop>
+						<prop key="action">Submit application|Review application|Re-submit application</prop>
+						<prop key="status">New|In process|Re-submit</prop>
+						<prop key="role">ROLE_SALES_DIRECTOR|ROLE_ACTING_SALES_DIRECTOR</prop>
+						<prop key="region"></prop>
+					</props>
+				</entry>
+				<entry key="N103">
+					<props>
+						<prop key="id">103</prop>
+						<prop key="title">Application is about Home Trade</prop>
+						<prop key="action">Submit application|Re-submit application</prop>
+						<prop key="status">New</prop>
+						<prop key="role">ROLE_OBSERVER</prop>
+						<prop key="region">6</prop>
+					</props>
+				</entry>
+			</map>
+		</property>
+		<property name="regions">
+			<map>
+				<entry key="1"><value>北美</value></entry>
+				<entry key="2"><value>中南美洲</value></entry>
+				<entry key="3"><value>欧洲 （除英国）</value></entry>
+				<entry key="4"><value>英国</value></entry>
+				<entry key="5"><value>亚太 （除中国）</value></entry>
+				<entry key="6"><value>中国大陆</value></entry>
+				<entry key="7"><value>南亚及印度</value></entry>
+				<entry key="8"><value>中东及非洲</value></entry>
+				<entry key="9"><value>中亚</value></entry>
+			</map>
+		</property>
+	</bean>
+	
+</beans>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/blank_template.xhtml">
+
+	<ui:define name="main_block">
+	<style type="text/css">
+	td {
+		font-family: 宋体;
+		font-size: 9pt;
+		padding: 2px;
+	}
+	
+	.cert_label {
+		background-color: #B6FFF2;
+		font-weight: bolder;
+		font-size: 9pt;
+	} 
+	
+	.cert_value {
+		background-color: #D2FFC6;
+		min-width: 400px;
+	}
+	</style>
+			<h:form>
+		<h:panelGroup id="searchPanel" layout="block">
+				<h:outputLabel value="证书验证" style="font-size: 12pt; color: #1A12FF; font-weight: bolder;"/>
+				
+				<h:outputLabel value="证书编号：" for="certificationSN" />
+				<h:inputText id="certificationSN" value="#{certificationSearchMgmtBean.certificationSN}" required="true" requiredMessage="必填"/>
+				<h:message for="certificationSN" style="color: red"/>
+				
+				<h:outputLabel value="证书验证码：" for="verficationCode"/>
+				<h:inputText id="verficationCode" value="#{certificationSearchMgmtBean.verficationCode}" required="true" requiredMessage="必填"/>
+				<h:message for="verficationCode" style="color: red"/>
+				
+				<h:commandButton action="#{certificationSearchMgmtBean.search}" value="验证">
+					<f:ajax execute="@form" render="@form"/>
+				</h:commandButton>
+		</h:panelGroup>
+		<h:panelGrid border="0" cellspacing="1" cellpadding="0" columns="2" id="searchResultPanel" rendered="#{not empty certificationSearchMgmtBean.searchResult}" columnClasses="cert_label, cert_value">
+			<h:outputLabel value="客户名称：" for="customer_name" />
+			<h:outputText id ="customer_name" value="#{certificationSearchMgmtBean.searchResult[8]}" />
+		
+			<h:outputLabel value="证书编号：" for="Certificate_SN" />
+			<h:outputText id ="Certificate_SN" value="#{certificationSearchMgmtBean.searchResult[0]}" />
+			
+			<h:outputLabel value="证书校验码：" for="Certificate_Verification_Code" />
+			<h:outputText id ="Certificate_Verification_Code" value="#{certificationSearchMgmtBean.searchResult[1]}" />
+			
+			<h:outputLabel value="证书类型：" for="Certificate_Type" />
+			<h:outputText id ="Certificate_Type" value="#{certificationSearchMgmtBean.searchResult[2]}" />
+			
+			<h:outputLabel value="证书登记日期：" for="Registration_Date" />
+			<h:outputText id ="Registration_Date" value="#{certificationSearchMgmtBean.searchResult[3]}">
+				<f:convertDateTime type="date" locale="zh_cn" timeZone="GMT+8"/>
+			</h:outputText>		
+
+			<h:outputLabel value="证书有效期至：" for="Expiration_Date" />
+			<h:outputText id ="Expiration_Date" value="#{certificationSearchMgmtBean.searchResult[4]}">
+				<f:convertDateTime type="date" locale="zh_cn" timeZone="GMT+8"/>
+			</h:outputText>		
+	
+			<h:outputLabel value="持证单位联系电话：" for="Owner_Tel" />
+			<h:outputText id ="Owner_Tel" value="#{certificationSearchMgmtBean.searchResult[5]}" />		
+
+			<h:outputLabel value="持证单位所在地：" for="Owner_Add" />
+			<h:outputText id ="Owner_Add" value="#{certificationSearchMgmtBean.searchResult[6]}" />		
+		
+			<h:outputLabel value="授权内容：" for="Warrant_Info" />
+			<h:outputText id ="Warrant_Info" value="#{certificationSearchMgmtBean.searchResult[7]}" />		
+		</h:panelGrid>
+
+		<h:panelGroup layout="block" id="no_data" rendered="#{empty certificationSearchMgmtBean.searchResult and not empty certificationSearchMgmtBean.verficationCode}">
+			<h:outputText value="无此证书，请核实！" />
+		</h:panelGroup>
+		
+			</h:form>		
+		
+			
+	</ui:define>
+
+</ui:composition>

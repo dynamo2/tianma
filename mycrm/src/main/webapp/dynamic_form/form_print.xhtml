@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/blank_template.xhtml">
+
+	<ui:define name="main_block">
+		<f:metadata>
+			<f:viewParam name="formMetadataId"
+				value="#{formPrintMgmtBean.formMetadataId}" />
+			<f:viewParam name="formRecordId"
+				value="#{formPrintMgmtBean.formRecordId}" />
+		</f:metadata>
+
+		<img src="../company_logo.jpg" style="width: 800px; height: 100px;"/>
+		<h:panelGroup layout="block" style="margin:5px;">
+			<center>
+				<h2>
+					<h:outputText value="#{formPrintMgmtBean.formMetadata.formLabel}" />
+				</h2>
+			</center>
+
+			<h:panelGroup layout="block"
+				style="border-bottom:2px solid #000000; padding: 4px;">
+				<h:panelGrid columns="2">
+					<h:outputLabel value="#{i18n.customer_name}: " />
+					<h:outputText value="#{formPrintMgmtBean.customer.name}"/>
+					
+					<h:outputLabel value="#{i18n.address1}: " />
+					<h:outputText value="#{formPrintMgmtBean.customer.address1}" />
+					
+					<h:outputLabel value="#{i18n.phone}: " />
+					<h:outputText value="#{formPrintMgmtBean.customer.phone}" />
+					
+					<c:if test="#{not empty formPrintMgmtBean.majorContact}">
+						<h:outputLabel value="#{i18n.contactPanel}-#{i18n.name}: " />
+						<h:outputText value="#{formPrintMgmtBean.majorContact.person.realName}" />
+						
+						<h:outputLabel value="#{i18n.contactPanel}-#{i18n.phone}: " />
+						<h:outputText value="#{formPrintMgmtBean.majorContact.person.phone}" />
+						
+						<h:outputLabel value="#{i18n.contactPanel}-#{i18n.mobile}: " />
+						<h:outputText value="#{formPrintMgmtBean.majorContact.person.mobile}" />
+					</c:if>
+				</h:panelGrid>
+			</h:panelGroup>
+
+			<style>
+				label {font-size: 11pt}
+				
+				td {font-size: 11pt}
+			</style>
+
+			<h:panelGroup binding="#{formPrintMgmtBean.printContent}" />
+
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

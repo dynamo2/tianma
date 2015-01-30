@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+
+		<f:metadata>
+			<f:viewParam name="customerId" value="#{fileuploadMgmtBean.fileupload.customerId}" />
+			<f:viewParam name="forType" value="#{fileuploadMgmtBean.fileupload.forType}" />
+			<f:viewParam name="forId" value="#{fileuploadMgmtBean.fileupload.forId}" />
+			<f:viewParam name="returnUrl" value="#{fileuploadMgmtBean.returnUrl}" />
+		</f:metadata>
+
+		<h:form id="fileUploadForm">
+			<h:panelGrid columns="2">
+				<h:outputLabel value="#{i18n.comments}" />
+				<h:inputTextarea value="#{fileuploadMgmtBean.fileupload.comments}" cols="100" rows="5"/>
+				
+				<h:outputLabel value="#{i18n.keywords}" />
+				<h:inputText value="#{fileuploadMgmtBean.fileupload.keywords}" size="100"/>
+			</h:panelGrid>
+
+			<ace:fileEntry id="fileEntryComp" label="File Entry"
+				relativePath="uploaded"
+				fileEntryListener="#{fileuploadMgmtBean.fileuploadListener}" maxFileCount="3" maxFileSize="#{1024 * 1024 * 5}"/>
+			<h:commandButton action="#{fileuploadMgmtBean.saveFile}"
+				value="#{i18n.save}" />
+			
+			<h:messages showSummary="true"/>
+			
+			<h:outputLink value="#{fileuploadMgmtBean.returnUrl}">
+				<h:outputText value="#{i18n.back}" />
+			</h:outputLink>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

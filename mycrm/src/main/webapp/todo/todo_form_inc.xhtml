@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ice="http://www.icesoft.com/icefaces/component"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<h:panelGrid columns="6">
+		<h:outputLabel value="#{i18n.assigneer}" for="todoAssigneer" />
+		<h:selectOneMenu id="todoAssigneer" value="#{todo.assigneerAccount}">
+			<f:selectItems value="#{systemAccountMgmt.allAccounts}" var="acct"
+				itemLabel="#{acct.accountName}" itemValue="#{acct.account}" />
+		</h:selectOneMenu>
+		
+		<!-- 
+		<h:outputLabel value="#{i18n.assigner}" for="todoAssigner" />
+		<h:selectOneMenu id="todoAssigner" value="#{todo.assignerAccount}">
+			<f:selectItems value="#{systemAccountMgmt.allAccounts}" var="acct"
+				itemLabel="#{acct.accountName}" itemValue="#{acct.account}" />
+		</h:selectOneMenu>
+		-->
+
+		<h:outputLabel value="#{i18n.planStart}" for="todoPlanStart" />
+		<h:panelGroup>
+			<ace:dateTimeEntry id="todoPlanStart" renderAsPopup="true"
+				value="#{todo.planStart}" pattern="yyyy-MM-dd" required="true" 
+				requiredMessage="#{i18n.validationRequired}" />
+			<br />
+			<h:message for="todoPlanStart" style="color:red;" />
+		</h:panelGroup>
+
+		<h:outputLabel value="#{i18n.planEnd}" for="todoPlanEnd" />
+		<h:panelGroup>
+			<ace:dateTimeEntry id="todoPlanEnd" renderAsPopup="true"
+				value="#{todo.planEnd}" pattern="yyyy-MM-dd" required="true"
+				requiredMessage="#{i18n.validationRequired}" />
+			<br />
+			<h:message for="todoPlanEnd" style="color:red;" />
+		</h:panelGroup>
+		
+		<h:outputLabel value="#{i18n.type}" for="todoType" />
+		<h:panelGroup>
+			<h:selectOneMenu id="todoType" value="#{todo.type}">
+				<f:selectItems value="#{selectionItems.todoTypeItems}"/>
+			</h:selectOneMenu>
+		</h:panelGroup>
+	</h:panelGrid>
+	<h:panelGrid columns="3">
+		<h:outputLabel value="#{i18n.content_title} " for="todoTitle" />
+		<h:inputText id="todoTitle" value="#{todo.title}"
+			readonly="#{editable eq 'false'}" required="true"
+			requiredMessage="#{i18n.validationRequired}" size="100">
+			<f:validateLength maximum="200" />
+		</h:inputText>
+		<h:message for="todoTitle" style="color:red;" />
+	
+		<h:outputLabel value="#{i18n.description} " for="todoDescription" />
+		<h:inputTextarea id="todoDescription" value="#{todo.description}"
+			readonly="#{editable eq 'false'}" required="true"
+			requiredMessage="#{i18n.validationRequired}" rows="5" cols="100" />
+		<h:message for="todoDescription" style="color:red;" />
+	</h:panelGrid>		
+</ui:fragment>

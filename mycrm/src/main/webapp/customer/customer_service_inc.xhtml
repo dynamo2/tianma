@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ace:panel header="#{i18n.CUSTOMER_SERVICE}" toggleable="true">
+		<h:outputLabel value="#{i18n.status}" />
+		<c:choose>
+			<c:when test="#{not empty appSessionParams.permissions['CUSTOMER_CHANGE_SERVICE_STATUS']}">
+				<h:selectOneMenu id="customerServiceStatus" value="#{customerForm.customer.serviceStatus}">
+					<f:selectItems value="#{enumListMgmtBean.customerServiceStatusEnumList}" var="s" itemLabel="#{s.value}" itemValue="#{s.id}"/>
+				</h:selectOneMenu>
+				<h:commandButton action="#{customerForm.saveServiceStatus()}" value="#{i18n.save}">
+					<f:ajax execute="customerServiceStatus" render="@this"/>
+				</h:commandButton>
+			</c:when>
+			<c:otherwise>
+				<h:outputText value="#{customerForm.customer.serviceStatus}" converter="enumListIdAndValueConverter"/>
+			</c:otherwise>
+		</c:choose>
+	</ace:panel>
+</ui:fragment>

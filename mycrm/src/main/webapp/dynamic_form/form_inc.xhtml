@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+
+<style>
+    .group_label {
+    border-bottom:1px solid #ccc;
+    margin-bottom:5px;
+    font-size:14px;
+    padding:5px;
+    padding-left:10px;
+    }
+</style>
+<h:panelGroup layout="block" style="border:1px solid #000000;">
+    <ui:repeat var="group" value="#{orderMgmtBean.groupView.groups}">
+        <h:panelGroup layout="block" style="padding: 5px;">
+
+            <h:panelGroup layout="block" styleClass="group_label">
+                <h:outputLabel value="#{group.label}" />
+            </h:panelGroup>
+
+            <ui:repeat var="row" value="#{group.rows}">
+                <h:panelGroup layout="block" style="padding-bottom: 10px;">
+                    <ui:repeat var="column" value="#{row.columns}" varStatus="status">
+                        <h:panelGroup style="margin: 2px;" rendered="#{empty column.field.referToFormMetadataId}">
+                            <nobr>
+                                <h:outputLabel value="#{column.field.fieldLabel} : " />
+                                <ui:param name="columnValue" value="#{orderMgmtBean.columnValue[column.columnName]}" />
+
+                                <!-- Multi-lines Input Area for VarChar type -->
+                                <h:inputTextarea id="field12" value="#{columnValue}"
+                                                 rows="#{column.inputRows}"
+                                                 cols="#{column.inputColumns}"
+                                                 rendered="#{column.isBigText}"
+                                                 required="#{column.isRequired}"
+                                                 requiredMessage="#{i18n.validationRequired}">
+                                    <f:validateLength maximum="200" />
+                                </h:inputTextarea>
+
+                                <!-- Multi-lines Input Area for Text type -->
+                                <h:inputTextarea id="field_type_text_12" value="#{columnValue}"
+                                                 rows="#{column.inputRows}"
+                                                 cols="#{column.inputColumns}"
+                                                 rendered="#{column.isTextArea}"
+                                                 required="#{column.isRequired}"
+                                                 requiredMessage="#{i18n.validationRequired}">
+                                    <f:validateLength maximum="2000" />
+                                </h:inputTextarea>
+
+                                <!-- Single-line Input Box for VarChar type -->
+                                <h:inputText id="field22" value="#{columnValue}"
+                                             size="#{column.inputColumns}"
+                                             rendered="#{column.isInputText}"
+                                             required="#{column.isRequired}"
+                                             requiredMessage="#{i18n.validationRequired}">
+                                    <f:validateLength maximum="200" />
+                                </h:inputText>
+
+                                <!-- Selection Input Box for VarChar type -->
+                                <h:selectOneMenu id="selection_input_for_varchar2" size="#{column.inputColumns}"
+                                                 value="#{columnValue}"
+                                                 rendered="#{column.isSelectOneMenu}">
+                                    <f:selectItems value="#{column.field.optionValuesList}"
+                                                   var="op" itemLabel="#{op[0]}" itemValue="#{op[1]}"/>
+                                </h:selectOneMenu>
+
+                                <!-- Output display the refered form Label.  Only display when there is no existing refered form.  -->
+                                <h:outputText id="fieldReferToNone2" value="#{column.field.referToFormMetadataId}"
+                                              converter="formMetadataIdToLabelConverter"
+                                              rendered="#{column.isReference}"/>
+
+                                <!-- Datetime input for datetime type  -->
+                                <ace:dateTimeEntry id="field32" renderAsPopup="true"
+                                                   value="#{columnValue}"
+                                                   pattern="yyyy-MM-dd HH:mm"
+                                                   timeZone="#{appSessionParams.timezone}"
+                                                   locale="#{appSessionParams.locale}"
+                                                   rendered="#{column.isDatetime}"
+                                                   required="#{column.isRequired}"
+                                                   requiredMessage="#{i18n.validationRequired}" />
+
+                                <!-- Single-line input box for int type -->
+                                <h:inputText id="field42" value="#{columnValue}"
+                                             rendered="#{column.isInt}"
+                                             required="#{column.isRequired}"
+                                             requiredMessage="#{i18n.validationRequired}"
+                                             validatorMessage="#{i18n.validationIntegerNumberOnly}">
+                                    <f:validateLongRange minimum="0"  />
+                                </h:inputText>
+
+                                <!-- Single-line input box for double type -->
+                                <h:inputText id="field52" value="#{columnValue}"
+                                             rendered="#{column.isDouble}"
+                                             required="#{column.isRequired}"
+                                             requiredMessage="#{i18n.validationRequired}"
+                                             validatorMessage="#{i18n.validationNumberOnly}">
+                                    <f:validateDoubleRange minimum="0"/>
+                                </h:inputText>
+
+                                <!-- Output box for Expression  -->
+                                <h:outputText id="field62" value="[#{column.field.expressionLabel} = #{columnValue}]"
+                                              rendered="#{column.isExpression}"/>
+
+                            </nobr>
+                        </h:panelGroup>
+                    </ui:repeat>
+                </h:panelGroup>
+            </ui:repeat>
+        </h:panelGroup>
+    </ui:repeat>
+</h:panelGroup>
+
+
+
+    <ace:panel header="#{formMetadata.formLabel}" toggleable="true"  style="padding:5px;margin:5px;">
+
+		<ui:repeat var="group" value="#{groupedFields}">
+            <h:panelGroup layout="block"
+				style="border-top: 1px solid #000000; padding: 5px; margin: 0px;">
+				
+				<ui:repeat var="row" value="#{group}">
+					<h:panelGroup layout="block" style="padding-bottom: 2px;">
+						<ui:repeat var="column" value="#{row}" varStatus="status">
+							<h:panelGroup style="margin: 2px;" rendered="#{empty column.referToFormMetadataId}">
+								<nobr>
+									<h:outputLabel value="#{column.fieldLabel} : " />
+
+									<!-- Multi-lines Input Area for VarChar type -->									
+									<h:inputTextarea id="field1" value="#{orderMgmtBean.columnValue[column.columnName]}" 
+										rows="#{column.inputRows}" cols="#{column.inputColumns}"  
+										rendered="#{column.inputRows > 1 and column.fieldType eq 'varchar'}" 
+										required="#{column.isRequired}" requiredMessage="#{i18n.validationRequired}">
+										<f:validateLength maximum="200" />
+									</h:inputTextarea>
+									<h:message for="field1" style="color:red"/>
+									
+									<!-- Multi-lines Input Area for Text type -->
+									<h:inputTextarea id="field_type_text_1" value="#{orderMgmtBean.columnValue[column.columnName]}" 
+										rows="#{column.inputRows}" cols="#{column.inputColumns}"  
+										rendered="#{column.fieldType eq 'text'}" 
+										required="#{column.isRequired}" requiredMessage="#{i18n.validationRequired}">
+										<f:validateLength maximum="2000" />
+									</h:inputTextarea>
+									<h:message for="field_type_text_1" style="color:red"/>
+									
+									<!-- Single-line Input Box for VarChar type -->
+									<h:inputText id="field2" value="#{orderMgmtBean.columnValue[column.columnName]}" size="#{column.inputColumns}" 
+										rendered="#{column.inputRows == 1 and 
+													column.fieldType eq 'varchar' and 
+													empty column.expression and 
+													empty column.referToFormMetadataId and
+													empty column.optionValues}" 
+										required="#{column.isRequired}" requiredMessage="#{i18n.validationRequired}">
+										<f:validateLength maximum="200" />
+									</h:inputText>
+									<h:message for="field2" style="color:red"/>
+									
+									<!-- Selection Input Box for VarChar type -->
+									<h:selectOneMenu id="selection_input_for_varchar" value="#{orderMgmtBean.columnValue[column.columnName]}" size="#{column.inputColumns}" 
+										rendered="#{column.inputRows == 1 and 
+													column.fieldType eq 'varchar' and 
+													empty column.expression and 
+													empty column.referToFormMetadataId and 
+													not empty column.optionValues}">
+										<f:selectItems value="#{column.optionValuesList}" var="op" itemLabel="#{op[0]}" itemValue="#{op[1]}"/>
+									</h:selectOneMenu>
+									                    
+									<!-- Output display the refered form Label.  Only display when there is no existing refered form.  -->
+									<h:outputText id="fieldReferToNone" value="#{column.referToFormMetadataId}" converter="formMetadataIdToLabelConverter" 
+										rendered="#{empty formRecordId and column.fieldType eq 'varchar' and not empty column.referToFormMetadataId and empty orderMgmtBean.columnValue[column.columnName]}"/>
+									<h:message for="fieldReferToNone" style="color:red"/>									                    
+									                                                                          
+									<!-- Output link to create a refered form.  Only display when there is no existing refered form.  -->
+									<!--<h:link id="fieldReferToNew" outcome="../order/new_order.jsf?parentFormFieldColumnName=#{column.columnName}&amp;parentFormRecordId=#{formRecordId}&amp;customerId=#{customerId}&amp;formMetadataId=#{column.referToFormMetadataId}"-->
+										<!--rendered="#{not empty formRecordId and column.fieldType eq 'varchar' and not empty column.referToFormMetadataId and empty orderMgmtBean.columnValue[column.columnName]}"-->
+										<!--target="_blank">-->
+										<!--<h:outputText value="#{column.referToFormMetadataId}" converter="formMetadataIdToLabelConverter" />-->
+									<!--</h:link>-->
+									<!--<h:message for="fieldReferToNew" style="color:red"/>-->
+
+									<!-- Output link to connect to refered form.  Only display when there is an existing refered form.  -->
+									<!--<h:link id="fieldReferToExist" outcome="../order/new_order.jsf?formBizKey=#{orderMgmtBean.columnValue[column.columnName]}"-->
+										<!--rendered="#{not empty formRecordId and column.fieldType eq 'varchar' and not empty column.referToFormMetadataId and not empty orderMgmtBean.columnValue[column.columnName]}"-->
+										<!--target="_blank">-->
+										<!--<nobr>-->
+										<!--<h:outputText value="#{column.referToFormMetadataId}" converter="formMetadataIdToLabelConverter" />-->
+										<!--<h:outputText value="#{orderMgmtBean.columnValue[column.columnName]}"  converter="formRecordBizKeyToSummaryConverter"/>-->
+										<!--</nobr>-->
+									<!--</h:link>-->
+									<!--<h:message for="fieldReferToExist" style="color:red"/>-->
+									
+									<!-- Datetime input for datetime type  -->
+									<ace:dateTimeEntry id="field3" renderAsPopup="true"
+										value="#{orderMgmtBean.columnValue[column.columnName]}" pattern="yyyy-MM-dd HH:mm" 
+										rendered="#{column.fieldType eq 'datetime'}" 
+										required="#{column.isRequired}" requiredMessage="#{i18n.validationRequired}"
+										timeZone="#{appSessionParams.timezone}"
+										locale="#{appSessionParams.locale}"
+										/>
+									<h:message for="field3" style="color:red"/>
+									
+									<!-- Single-line input box for int type -->
+									<h:inputText id="field4" value="#{orderMgmtBean.columnValue[column.columnName]}"  
+										rendered="#{column.fieldType eq 'int' and empty column.expression}" 
+										required="#{column.isRequired}" requiredMessage="#{i18n.validationRequired}" 
+										validatorMessage="#{i18n.validationIntegerNumberOnly}">
+										<f:validateLongRange minimum="0"  />
+									</h:inputText>
+									<h:message for="field4" style="color:red"/>
+									
+									<!-- Single-line input box for double type -->
+									<h:inputText id="field5" value="#{orderMgmtBean.columnValue[column.columnName]}"  
+										rendered="#{column.fieldType eq 'double' and empty column.expression}" 
+										required="#{column.isRequired}" requiredMessage="#{i18n.validationRequired}"
+										validatorMessage="#{i18n.validationNumberOnly}">
+										<f:validateDoubleRange minimum="0"/>
+									</h:inputText>
+									<h:message for="field5" style="color:red"/>
+							
+									<!-- Output box for Expression  -->		
+									<h:outputText id="field6" value="[#{column.expressionLabel} = #{orderMgmtBean.columnValue[column.columnName]}]" 
+										rendered="#{not empty column.expression}"/>
+									<h:message for="field6" style="color:red"/>
+								</nobr>
+							</h:panelGroup>
+						</ui:repeat>
+					</h:panelGroup>
+				</ui:repeat>
+			</h:panelGroup>
+		</ui:repeat>
+	</ace:panel>
+
+    <ui:repeat var="kidMetadata" value="#{orderMgmtBean.kidMetadataList}">
+        <ace:panel header="#{kidMetadata.formLabel}" toggleable="true"  style="padding:5px;margin:5px;">
+
+            <ui:param name="kidField" value="#{orderMgmtBean.kidFormFields[kidMetadata.id]}" />
+
+            <h:link id="fieldReferToNew" outcome="/order/new_order.jsf?parentFormFieldColumnName=#{kidField.columnName}&amp;parentFormRecordId=#{formRecordId}&amp;customerId=#{customerId}&amp;formMetadataId=#{kidMetadata.id}"
+                    target="_blank">
+                <h:outputText value="#{i18n._new}#{kidMetadata.formLabel}" />
+            </h:link>
+
+            <ui:include src="/order/data_list_inc.xhtml">
+                <ui:param name="dataList" value="#{orderMgmtBean.kidsMap[kidMetadata.id]}" />
+            </ui:include>
+        </ace:panel>
+    </ui:repeat>
+</ui:fragment>

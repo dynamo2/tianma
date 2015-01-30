@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+             xmlns:h="http://java.sun.com/jsf/html"
+             xmlns:f="http://java.sun.com/jsf/core"
+             xmlns:c="http://java.sun.com/jsp/jstl/core"
+             xmlns:ace="http://www.icefaces.org/icefaces/components"
+             xmlns:ice="http://www.icesoft.com/icefaces/component"
+             xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <style>
+        .ui-combobox {
+        position: relative;
+        display: inline-block;
+        }
+        .ui-combobox-toggle {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin-left: -1px;
+        padding: 0;
+        /* support: IE7 */
+        *height: 1.7em;
+        *top: 0.1em;
+        }
+        .ui-combobox-input {
+        margin: 0;
+        padding: 0.3em;
+        }
+    </style>
+    <script language="javaScript">
+        $(function(){
+        $(".accountParentSelect").combobox();
+        });
+    </script>
+<h:inputHidden id="accountId" value="#{account.id}" rendered="#{account.id ne null}"/>
+
+<div class="form-header"><h:outputLabel value="#{i18n.accountPanel}" /></div>
+
+<h:panelGrid columns="4" styleClass="form-table" columnClasses="td-label,td-input,td-label,td-input">
+
+    <h:outputLabel value="#{i18n.account}" for="account"/>
+    <h:panelGroup>
+        <h:inputText id="account" value="#{account.account}"
+                     readonly="#{editable eq 'false'}" required="true"
+                     requiredMessage="#{i18n.validationRequired}"
+                     disabled="#{account.id ne null}">
+            <f:validator for="account" validatorId="systemAccountValidator"/>
+        </h:inputText>
+        <h:message for="account" style="color:red;"/>
+    </h:panelGroup>
+
+    <h:outputLabel value="#{i18n.password}" for="password" rendered="#{accountForm.isOwner}"/>
+    <h:inputText id="password" value="#{account.password}" rendered="#{accountForm.isOwner}"/>
+
+    <h:outputText value="" rendered="#{not accountForm.isOwner}" />
+    <h:inputText style="visibility:hidden;" value="" rendered="#{not accountForm.isOwner}" />
+
+    <h:outputLabel value="#{i18n.accountParent}" for="parentId"/>
+    <h:selectOneMenu id="parentId" styleClass="accountParentSelect"
+                     value="#{accountForm.account.parentId}">
+        <f:selectItem itemLabel="#{i18n.pleaseSelectOne}" itemValue="0" />
+        <f:selectItems value="#{accountForm.accountList}" var="c"
+                       itemLabel="#{c.accountName}" itemValue="#{c.id}" />
+    </h:selectOneMenu>
+
+    <h:outputLabel value="#{i18n.language}" for="language"/>
+    <h:selectOneMenu id="language" value="#{account.language}"
+                     readonly="#{editable eq 'false'}">
+        <f:selectItems value="#{selectionItems.languageItems}"/>
+    </h:selectOneMenu>
+</h:panelGrid>
+
+<h:panelGrid columns="2" styleClass="form-table" columnClasses="td-label,td-input,td-label,td-input">
+    <h:outputLabel value="子用户" for="childrenGrid" rendered="#{accountForm.isOwner}" />
+    <h:panelGroup rendered="#{accountForm.isOwner}">
+        <h:outputLabel value="没有子用户" rendered="#{empty accountForm.account.children}" />
+        <h:panelGroup id="childrenGrid"  rendered="#{not empty accountForm.account.children}">
+            <ui:repeat var="c" value="#{accountForm.account.children}">
+                <h:outputLink value="../system/system_account_form.jsf?id=#{c.id}"  target="_self"
+                              style="margin-left:10px;" rendered="#{accountForm.accountEditable}">
+                    <h:outputText value="#{c.accountName}" />
+                </h:outputLink>
+
+                <h:outputText value="#{c.accountName}" style="margin-left:10px;"
+                              rendered="#{not accountForm.accountEditable}"/>
+            </ui:repeat>
+        </h:panelGroup>
+    </h:panelGroup>
+
+    <h:outputLabel value="#{i18n.roles}" for="roles"/>
+    <h:selectManyCheckbox id="roles" value="#{account.roleList}"
+                          readonly="#{editable eq 'false'}" disabled="#{not appSessionParams.roleSalesDirector}"
+                          layout="pageDirection">
+        <f:selectItems id="rolesItems" value="#{roleMgmt.roleList}" var="role"
+                       itemLabel="#{roleMgmt.roleName2Label[role.roleName]}" itemValue="#{role.roleName}"/>
+    </h:selectManyCheckbox>
+
+    <h:outputLabel value="#{i18n.notes}" for="notes"/>
+    <h:inputTextarea id="notes" value="#{account.notes}"
+                     readonly="#{editable eq 'false'}" rows="5" cols="100"/>
+
+</h:panelGrid>
+
+<!--<h:panelGroup layout="block" rendered="#{appSessionParams.roleAdmin || appSessionParams.roleSalesDirector}">-->
+    <!--<h:commandButton value="#{i18n.reset_password}" action="#{accountForm.resetPassword}">-->
+        <!--<f:ajax execute="@this" render="@none" onevent="checkAjaxStatus"/>-->
+    <!--</h:commandButton>-->
+<!--</h:panelGroup>-->
+
+</ui:fragment>

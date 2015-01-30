@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+		<f:metadata>
+			<f:viewParam name="reportDefinitionId" value="#{dynamicFormReportDefinitionMgmtBean.reportDefinitionId}"  />
+		</f:metadata>
+		
+		<h:form id="dynamicFormReportRun">	
+			<ace:panel header="i18n.report">
+				<h:panelGrid columns="2" cellspacing="5px;">
+					<h:outputLabel for="form_label" value="#{i18n.report_for}" />
+					<h:outputText id="form_label" value="#{dynamicFormReportDefinitionMgmtBean.formMetadata.formLabel}" />
+					
+					<h:outputLabel for="reportLabel" value="#{i18n.report_label}" />
+					<h:outputText id="reportLabel" value="#{dynamicFormReportDefinitionMgmtBean.reportDefinition.reportLabel}" />
+					
+					<h:outputLabel for="reportDescription" value="#{i18n.report_description}" />
+					<h:outputText id="reportDescription" value="#{dynamicFormReportDefinitionMgmtBean.reportDefinition.reportDescription}" />
+				</h:panelGrid>
+				<h:commandLink id="downloadFile" value="#{i18n.report_download}" action="#{dynamicFormReportDefinitionMgmtBean.downloadReportResult}" target="_blank">
+					<f:ajax disabled="true"/>
+				</h:commandLink>
+			</ace:panel>	
+			
+			<ace:dataTable id="formReportResultTable"
+				value="#{dynamicFormReportDefinitionMgmtBean.reportResult}" var="rst" emptyMessage="#{i18n.noData}"
+				paginator="true" paginatorPosition="bottom" rows="200">
+				
+				<c:forEach var="reportColumn" items="#{dynamicFormReportDefinitionMgmtBean.reportDefinition.reportDefinitionObj.selectColumns}" varStatus="status" >
+					<ace:column headerText="#{dynamicFormReportDefinitionMgmtBean.selectedColumnName2LabelMap[reportColumn.name]}">
+						<c:choose>
+							<c:when test="#{reportColumn.name eq 'customer_id'}">
+								<h:link outcome="../customer/customer_mgmt.jsf?id=#{rst[status.index]}" target="_self">
+									<h:outputText value="#{rst[status.index]}" converter="customerNameAndIdConverter"/>
+								</h:link>
+							</c:when>
+							<c:when test="#{reportColumn.name eq 'status'}">
+								<h:outputText value="#{rst[status.index]}" converter="formWorkFlowStatusNameToLabelConverter"/>
+							</c:when>
+							<c:when test="#{reportColumn.name eq 'form_biz_id'}">
+								<h:link outcome="../order/new_order.jsf?formBizKey=#{rst[status.index]}" target="_self">
+									<h:outputText value="#{rst[status.index]}" />
+								</h:link>
+							</c:when>
+							<c:otherwise>
+								<h:outputText value="#{rst[status.index]}" />
+							</c:otherwise>
+						</c:choose>
+					</ace:column>
+				</c:forEach>
+				
+			</ace:dataTable>
+		</h:form>
+		
+		<h:panelGroup layout="block" style="border:1px solid #000000; padding: 5px; width: 600px; overflow:auto;">
+			<h:outputText value="#{dynamicFormReportDefinitionMgmtBean.debugSql}" />
+		</h:panelGroup>
+							
+	</ui:define>
+
+</ui:composition>

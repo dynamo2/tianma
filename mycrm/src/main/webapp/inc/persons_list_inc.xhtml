@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ice="http://www.icesoft.com/icefaces/component"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ace:dataTable id="personsList"
+				value="#{personsList}" var="person" paginator="true"
+				paginatorPosition="bottom" rows="10" emptyMessage="#{i18n.noData}">
+		<ace:column headerText="#{i18n.id}">
+			<h:outputText value="#{person.id}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.firstName}">
+			<h:outputText value="#{person.firstName}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.lastName}">
+			<h:outputText value="#{person.lastName}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.birthday}">
+			<h:outputText value="#{person.birthday}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.gender}">
+			<h:outputText value="#{person.gender}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.idType}">
+			<h:outputText value="#{person.idType}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.idNum}">
+			<h:outputText value="#{person.idNum}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.phone}">
+			<h:outputText value="#{person.phone}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.mobile}">
+			<h:outputText value="#{person.mobile}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.email}">
+			<h:outputText value="#{person.email}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.title}">
+			<h:outputText value="#{person.title}" />
+		</ace:column>
+	</ace:dataTable>
+
+</ui:fragment>

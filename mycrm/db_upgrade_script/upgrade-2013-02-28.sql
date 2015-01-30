@@ -1,0 +1,1 @@
+ALTER TABLE `mycrm`.`form_field_metadata` ADD COLUMN `is_label` BIT(1) NOT NULL  AFTER `default_value` ;

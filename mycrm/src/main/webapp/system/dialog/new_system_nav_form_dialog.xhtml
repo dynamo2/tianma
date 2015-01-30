@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+             xmlns:h="http://java.sun.com/jsf/html"
+             xmlns:f="http://java.sun.com/jsf/core"
+             xmlns:c="http://java.sun.com/jsp/jstl/core"
+             xmlns:ace="http://www.icefaces.org/icefaces/components"
+             xmlns:ui="http://java.sun.com/jsf/facelets"
+             xmlns:customer="http://java.sun.com/jsf/composite/tags/customer">
+
+    <ace:dialog id="newSystemNavFormDialog" header="添加系统表单" closable="true" modal="true"
+                draggable="true" showEffect="clip" hideEffect="fade" widgetVar="newSystemNavFormDialog"
+                resizable="true" width="400" height="250" styleClass="dialog">
+
+        <table class="form-table">
+            <tr>
+                <td class="td-label"><h:outputLabel value="表单名" for="editSystemFormLabel" /></td>
+                <td class="td-input">
+                    <h:inputText id="editSystemFormLabel" required="true" class="newSystemFormLabel"
+                                 value="#{navMgmt.newSystemNavForm.label}"
+                                 requiredMessage="#{i18n.validationRequired}" />
+                    <h:message for="editSystemFormLabel" style="color:red;"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-label"><h:outputLabel value="URL" for="editSystemFormURL" /></td>
+                <td class="td-input">
+                    <h:inputText id="editSystemFormURL" required="true" class="newSystemFormLabel"
+                                 value="#{navMgmt.newSystemNavForm.url}"
+                                 requiredMessage="#{i18n.validationRequired}" />
+                    <h:message for="editSystemFormURL" style="color:red;"/>
+                </td>
+            </tr>
+            <tr>
+                <th class="td-input" colspan="2">
+                    <h:commandButton value="保存" action="#{navMgmt.saveSystemNavForm}">
+                        <f:ajax execute="newSystemNavFormDialog" render="systemNavFormPanel newSystemNavFormDialog" />
+                    </h:commandButton>
+                    <h:button value="取消" onclick="newSystemNavFormDialog.hide();" />
+                </th>
+            </tr>
+        </table>
+    </ace:dialog>
+</ui:fragment>

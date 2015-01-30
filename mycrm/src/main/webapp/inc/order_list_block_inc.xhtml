@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+             xmlns:h="http://java.sun.com/jsf/html"
+             xmlns:f="http://java.sun.com/jsf/core"
+             xmlns:c="http://java.sun.com/jsp/jstl/core"
+             xmlns:ace="http://www.icefaces.org/icefaces/components"
+             xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <ace:panel toggleable="true" id="orderListViewPanel#{block.formMetadata.id}" styleClass="orderBlockPanelClass#{block.formMetadata.id}"
+               style="width:600px;height:200px;float:left;margin-left:5px;border:0px;">
+        <f:facet name="header">
+            <h:outputLabel value="#{block.formMetadata.formLabel}(" />
+            <h:outputLabel value="#{i18n.NEW}:" />
+            <h:link outcome="order/order_list.jsf?formMetadataId=#{block.formMetadata.id}&amp;searchStatus=NEW"
+                    value="#{block.formMDStatisticsEntry.newCount}" target="_self" />
+            <h:outputLabel value="#{i18n.END}:" style="margin:5px;" />
+            <h:link outcome="order/order_list.jsf?formMetadataId=#{block.formMetadata.id}&amp;searchStatus=END"
+                    value="#{block.formMDStatisticsEntry.endCount}" target="_self" />
+            <h:outputLabel value="#{i18n.PROCESSING}:"  style="margin:5px;" />
+            <h:link outcome="order/order_list.jsf?formMetadataId=#{block.formMetadata.id}&amp;neStatus=NEW,END"
+                    value="#{block.formMDStatisticsEntry.proceeingCount}" target="_self" />
+            <h:outputLabel value=")" />
+
+            <h:link outcome="order/order_list.jsf?formMetadataId=#{block.formMetadata.id}" value="#{i18n.list}" target="_self" style="margin-left:25px;" />
+            <h:outputLabel value=" | " />
+            <h:link outcome="order/new_order.jsf?formMetadataId=#{block.formMetadata.id}"
+                    value="#{i18n._new}" target="_self" style="margin-left:5px;" rendered="#{block.creatable}" />
+            <h:outputLabel value=" | " rendered="#{block.creatable}" />
+            <h:commandLink value="#{i18n.refresh}" action="#{block.refresh}"
+                           styleClass="orderBlockRefreshLink#{block.formMetadata.id}" style="margin-left:5px;">
+                <f:ajax execute="@this" render="orderListTable_#{block.formMetadata.id}">
+                    <f:param name="formMetadataId" value="#{block.formMetadata.id}" />
+                </f:ajax>
+            </h:commandLink>
+        </f:facet>
+
+        <ace:dataTable id="orderListTable_#{block.formMetadata.id}" value="#{block.formDatas}" var="f"
+                       paginatorPosition="bottom" rows="5">
+            <ace:column headerText="#{i18n.summary}">
+                <h:link outcome="order/new_order.jsf?id=#{f.id}" value="#{f.summary}" target="_self" />
+            </ace:column>
+            <ace:column headerText="#{i18n.status}">
+                <nobr> <h:outputText value="#{f.status}" /> </nobr>
+            </ace:column>
+        </ace:dataTable>
+    </ace:panel>
+
+    <script language="javaScript">
+        $(function() {
+            $( ".orderBlockRefreshLink#{block.formMetadata.id}" ).click();
+        });
+    </script>
+</ui:fragment>

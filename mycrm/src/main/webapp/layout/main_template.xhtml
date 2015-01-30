@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components">
+<f:view contentType="text/html" encoding="UTF-8"
+	locale="#{appSessionParams.locale}">
+
+	<h:head>
+		<f:facet name="title">haha</f:facet>
+		<h:outputScript library="javascript" name="common_functions.js" target="head" />
+		<h:outputStylesheet name="style.css" library="css" />
+        <!--<link rel="stylesheet" href="../jquery/themes/redmond/jquery-ui-1.10.2.custom.css" />-->
+        <link rel="stylesheet" href="../jquery/themes/redmond/jquery-ui-1.10.2.custom.min.css" />
+        <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+        <script src="../jquery/combobox.js"></script>
+	</h:head>
+	<h:body style="background-color: #FFFFFF;">
+		<ace:menuBar id="mainMenu" style="width:99%">
+			<ace:menuItem value="${i18n.home}" url="/" target="_self"
+				icon="ui-icon ui-icon-home" />
+				
+			<c:forEach items="#{dataCenterNavigationBarMgmtBean.dataCenterNavigation}" var="navs">
+				<ace:submenu label="${navs.itemLabel}"
+					icon="ui-icon">
+					<c:forEach items="#{navs.formMetatDataList}" var="formMetadata">
+						<ace:menuItem 
+							value="${formMetadata.formLabel}"
+							url="/order/order_list.jsf?formMetadataId=#{formMetadata.id}" target="_self" />
+					</c:forEach>
+				</ace:submenu>
+			</c:forEach>
+				
+			<ace:submenu id="mainCustomerMenu" label="${i18n.mainCustomerMenu}"
+				icon="ui-icon" rendered="#{not empty appSessionParams.permissions['CUSTOMER']}">
+				<ace:menuItem id="mainCustomerListMenuItem"
+					value="${i18n.mainCustomerListMenuItem}"
+					url="/customer/customer_list.jsf" 
+					target="_self" 
+					rendered="#{(not empty appSessionParams.permissions['CUSTOMER_QUERY'])}"/>
+				<ace:menuItem id="mainCustomerNewMenuItem"
+					value="${i18n.mainCustomerNewMenuItem}"
+					url="/customer/customer_form.jsf" 
+					target="_self" 
+					rendered="#{not empty appSessionParams.permissions['CUSTOMER_NEW']}" />
+			</ace:submenu>
+			 
+			<ace:submenu id="mainOrderMenu" label="${i18n.mainOrderMenu}"
+				icon="ui-icon" rendered="#{not empty appSessionParams.permissions['FORM_DATA']}">
+				<ace:menuItem id="mainDataCenterSearchMenuItem"
+					value="${i18n.mainDataCenterSearchMenuItem}"
+					url="/order/search_data.jsf" target="_self" 
+					rendered="#{not empty appSessionParams.permissions['FORM_DATA_QUERY_ALL']}"/>
+			</ace:submenu>
+				
+			<ace:submenu id="mainFormMenu" label="${i18n.mainFormMenu}" 
+				rendered="#{not empty appSessionParams.permissions['FORM']}"
+				icon="ui-icon">
+				<ace:menuItem id="mainFormListMenuItem"
+					value="${i18n.mainFormListMenuItem}"
+					url="/dynamic_form/form_list.jsf" target="_self" 
+					rendered="#{not empty appSessionParams.permissions['FORM_QUERY']}"/>
+				<ace:menuItem id="mainFormConfigMenuItem"
+					value="${i18n.mainFormConfigMenuItem}"
+					url="/dynamic_form/form_config.jsf" target="_self"
+					rendered="#{not empty appSessionParams.permissions['FORM_NEW']}" />
+			</ace:submenu>
+			
+			<ace:submenu id="mainReportMenu" label="${i18n.mainReportMenu}"
+				icon="ui-icon"
+				rendered="#{not empty appSessionParams.permissions['REPORT']}" >
+				<ace:menuItem id="mainReportListMenuItem"
+					value="${i18n.mainReportListMenuItem}"
+					url="/dynamic_form/form_report_list.jsf" target="_self"
+					rendered="#{not empty appSessionParams.permissions['REPORT_QUERY']}" />
+			</ace:submenu>
+			
+			
+			<ace:submenu id="mainAdminMenu" label="${i18n.mainAdminMenu}" icon="ui-icon">
+				<ace:menuItem id="mainUserListMenuItem"
+					value="${i18n.mainUserListMenuItem}"
+					url="/system/system_account_list.jsf" target="_self" 
+					rendered="#{not empty appSessionParams.permissions['ACCOUNT_QUERY']}"/>
+				<ace:menuItem id="mainUserNewMenuItem"
+					value="${i18n.mainUserNewMenuItem}"
+					url="/system/system_account_form.jsf" target="_self"
+					rendered="#{not empty appSessionParams.permissions['ACCOUNT_NEW']}"/>
+				<ace:menuItem id="mainSystemRoleCfgMenuItem"
+					value="${i18n.mainSystemRoleCfgMenuItem}"
+					url="/system/system_roles.jsf" target="_self"/>
+				<ace:menuItem id="mainChangeMyAccountMenuItem"
+					value="${i18n.mainChangeMyAccountMenuItem}"
+					url="/system/system_account_form.jsf?id=#{appSessionParams.currentAccount.id}" target="_self" />
+			</ace:submenu>			
+			
+			<ace:menuItem id="logoutMenuItem" value="${i18n.logout}"
+				url="/j_spring_security_logout" target="_self" />
+		</ace:menuBar>
+		<ace:panel style="width:99%; margin-top:5px; min-height:500px;border:0px;">
+			<ui:insert name="main_block" />
+		</ace:panel>
+		
+		<!-- Show help tips for element with "title" attribute -->
+		<!-- 
+		<ace:tooltip position="bottomRight" global="true" />
+		 -->
+	</h:body>
+</f:view>
+</html>

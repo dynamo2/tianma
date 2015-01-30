@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:order="http://java.sun.com/jsf/composite/tags/order"
+	template="layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+		<h:panelGrid columns="2" width="100%">
+			<h:form id="myTodosListForm">
+
+                <c:forEach var="ob" items="#{dashboardMgmtBean.orderBlocks}">
+                    <ui:include src="/inc/order_list_block_inc.xhtml">
+                        <ui:param name="block" value="#{ob}" />
+                    </ui:include>
+                </c:forEach>
+                <div style="clear:both;"></div>
+
+				<ace:panel header="#{i18n.forms_operated_before}" toggleable="true">
+					<div style="overflow: auto; width: 100%">
+						<ace:dataTable id="orderListTable"
+							value="#{dashboardMgmtBean.myOperationHistory}" var="f" paginator="true"
+							paginatorPosition="bottom" rows="20" emptyMessage="#{i18n.noData}">
+							<ace:column headerText="#{i18n.customer_name}">
+								<h:outputText value="#{f.customerId}" converter="customerNameAndIdConverter"/>
+							</ace:column>
+							<ace:column headerText="#{i18n.summary}">
+								<h:outputText value="#{f.summary}" converter="customerNameAndIdConverter"/>
+							</ace:column>
+							<ace:column headerText="#{i18n.assignee}">
+								<nobr> <h:outputText value="#{f.assigneeAccount}" converter="accountToDisplayNameConverter"/> </nobr>
+							</ace:column>
+							<ace:column headerText="#{i18n.status}">
+								<nobr> <h:outputText value="#{f.status}" converter="formWorkFlowStatusNameToLabelConverter" /> </nobr>
+							</ace:column>
+							<ace:column headerText="#{i18n.lastModified}">
+								<h:outputText value="#{f.lastModified}">
+									<f:convertDateTime type="both" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.lastModifiedBy}">
+								<h:outputText value="#{f.lastModifiedBy}"  converter="accountToDisplayNameConverter"/>
+							</ace:column>
+							<ace:column headerText="#{i18n.created}">
+								<h:outputText value="#{f.created}">
+									<f:convertDateTime type="both" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.createdBy}">
+								<nobr> <h:outputText value="#{f.createdBy}"  converter="accountToDisplayNameConverter"/> </nobr>
+							</ace:column>
+							<ace:column>
+								<nobr> <h:link outcome="order/new_order.jsf?id=#{f.id}"
+									value="#{i18n.management}" target="_self" />
+								</nobr>
+							</ace:column>
+						</ace:dataTable>
+					</div>
+				</ace:panel>
+				
+				<ace:panel header="#{i18n.toMeNotStartTodoList}" toggleable="true">
+						<ace:dataTable id="toMeNotStartTodoList"
+							value="#{dashboardMgmtBean.toMeNotStartTodoList}" var="todo"
+							emptyMessage="#{i18n.noData}">
+							<ace:column headerText="#{i18n.customerName}">
+								<h:link outcome="/customer/customer_mgmt.jsf?id=#{todo.customerId}"
+									value="#{todo.customerName}" target="_self" />
+							</ace:column>
+							<ace:column headerText="#{i18n.content_title}">
+								<h:outputText value="#{todo.title}"/>
+							</ace:column>
+							<ace:column headerText="#{i18n.createdBy}">
+								<h:outputText value="#{todo.createdBy}" converter="accountToDisplayNameConverter"/>
+							</ace:column>
+							<ace:column headerText="#{i18n.planStart}">
+								<h:outputText value="#{todo.planStart}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+						</ace:dataTable>
+				</ace:panel>
+				
+				<ace:panel header="#{i18n.toMeNotFinishedTodoList}" toggleable="true">
+						<ace:dataTable id="toMeNotFinishedTodoList"
+							value="#{dashboardMgmtBean.toMeNotFinishedTodoList}" var="todo"
+							emptyMessage="#{i18n.noData}">
+							<ace:column headerText="#{i18n.customerName}">
+								<h:link outcome="/customer/customer_mgmt.jsf?id=#{todo.customerId}"
+									value="#{todo.customerName}" target="_self" />
+							</ace:column>
+							<ace:column headerText="#{i18n.content_title}">
+								<h:outputText value="#{todo.title}"/>
+							</ace:column>
+							<ace:column headerText="#{i18n.createdBy}">
+								<h:outputText value="#{todo.createdBy}" converter="accountToDisplayNameConverter" />
+							</ace:column>
+							<ace:column headerText="#{i18n.planStart}">
+								<h:outputText value="#{todo.planStart}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.actualStart}">
+								<h:outputText value="#{todo.actualStart}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.planEnd}">
+								<h:outputText value="#{todo.planEnd}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+						</ace:dataTable>
+				</ace:panel>
+				
+				<ace:panel header="#{i18n.toMeFinishedTodoList}" toggleable="true">
+						<ace:dataTable id="toMeFinishedTodoList"
+							value="#{dashboardMgmtBean.toMeFinishedTodoList}" var="todo"
+							emptyMessage="#{i18n.noData}">
+							<ace:column headerText="#{i18n.customerName}">
+								<h:link outcome="/customer/customer_mgmt.jsf?id=#{todo.customerId}"
+									value="#{todo.customerName}" target="_self" />
+							</ace:column>
+							<ace:column headerText="#{i18n.createdBy}">
+								<h:outputText value="#{todo.createdBy}" converter="accountToDisplayNameConverter" />
+							</ace:column>
+							<ace:column headerText="#{i18n.content_title}">
+								<h:outputText value="#{todo.title}"/>
+							</ace:column>
+							<ace:column headerText="#{i18n.planStart}">
+								<h:outputText value="#{todo.planStart}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.actualStart}">
+								<h:outputText value="#{todo.actualStart}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.planEnd}">
+								<h:outputText value="#{todo.planEnd}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.actualEnd}">
+								<h:outputText value="#{todo.actualEnd}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+						</ace:dataTable>
+				</ace:panel>
+				
+				<ace:panel header="#{i18n.createdByMeTodoList}" toggleable="true">
+						<ace:dataTable id="createdByMeTodoList"
+							value="#{dashboardMgmtBean.createdByMeTodoList}" var="todo"
+							emptyMessage="#{i18n.noData}">
+							<ace:column headerText="#{i18n.customerName}">
+								<h:link outcome="/customer/customer_mgmt.jsf?id=#{todo.customerId}"
+									value="#{todo.customerName}" target="_self" />
+							</ace:column>
+							<ace:column headerText="#{i18n.content_title}">
+								<h:outputText value="#{todo.title}"/>
+							</ace:column>
+							<ace:column headerText="#{i18n.assignee}">
+								<h:outputText value="#{todo.assigneeAccount}" converter="accountToDisplayNameConverter" />
+							</ace:column>
+							<ace:column headerText="#{i18n.planStart}">
+								<h:outputText value="#{todo.planStart}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.actualStart}">
+								<h:outputText value="#{todo.actualStart}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.planEnd}">
+								<h:outputText value="#{todo.planEnd}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+							<ace:column headerText="#{i18n.actualEnd}">
+								<h:outputText value="#{todo.actualEnd}">
+									<f:convertDateTime type="date" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+								</h:outputText>
+							</ace:column>
+						</ace:dataTable>
+				</ace:panel>
+			</h:form>
+		</h:panelGrid>
+	</ui:define>
+
+</ui:composition>

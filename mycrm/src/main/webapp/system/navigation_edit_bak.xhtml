@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:ace="http://www.icefaces.org/icefaces/components"
+                xmlns:ice="http://www.icesoft.com/icefaces/component"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layout/main_template.xhtml" xmlns:p="http://java.sun.com/jsf/html">
+
+    <ui:define name="main_block">
+        <script src="jquery/navigation.js"></script>
+        <script language="javaScript">
+            $(function(){
+                initNavigation();
+            });
+        </script>
+        <style>
+            .td-category,.td-form {
+                padding:15px 40px;
+            }
+            .nav_form {
+                width:250px;
+            }
+            .categoryAccordion {
+                width:300px;
+                zoom:1;
+            }
+
+            .categoryAccordion div{
+                padding:0px;
+            }
+
+            .categoryAccordion ol{
+                padding-top:10px;
+                padding-bottom:10px;
+            }
+
+            .nav_category li,.nav_form li {
+                border-bottom:1px dashed #cccccc;
+                line-height:200%;
+                width:150px;
+                padding-left:15px;
+            }
+
+            .list-table th {
+                padding:5px 15px;
+                border-bottom:1px #79b7e7 solid;
+                color:#2e6e9e;
+            }
+
+            .list-table td {
+                line-height:200%;
+                padding:0px 15px;
+                border-bottom:1px dashed #cccccc;
+            }
+
+            /* Icons
+            ----------------------------------*/
+
+            /* states and images */
+            .nav-icon {
+                width: 16px;
+                height: 16px;
+                content: "";
+                background-image: url(../jquery/themes/redmond/images/ui-icons_469bdd_256x240.png);
+            }
+
+            /* positioning */
+            .nav-icon-pencil { background-position: -64px -112px; }
+            .nav-icon-disk { background-position: -96px -112px; }
+            .nav-icon-circle-close { background-position: -32px -192px; }
+            .nav-icon-circle-plus { background-position: 0 -192px; }
+
+            .preCategoryLabelEdit,.preCategoryLabelSave,.preCategoryLabelDelete,.preCategoryLabelAdd{
+                float:left;
+                margin-right:5px;
+            }
+
+            .preCategoryLabelAdd{
+                border: 1px solid #c5dbec;
+                background: #dfeffc url(../jquery/themes/redmond/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
+                font-weight: bold;
+                color: #2e6e9e;
+                cursor: pointer;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+
+            .nav-state-hover{
+                border: 1px solid #79b7e7;
+                background: #d0e5f5 url(../jquery/themes/redmond/images/ui-bg_glass_75_d0e5f5_1x400.png) 50% 50% repeat-x;
+                font-weight: bold;
+                color: #1d5987;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+
+            .preCategoryLabelInput {
+                line-height:200%;
+                padding:5px;
+            }
+        </style>
+        <h:panelGrid columns="3" columnClasses="td-category,td-form">
+
+            <ace:panel header="导航分类" layout="block">
+                <f:facet name="header">
+                    <h:outputLabel value="导航分类" />
+                    <div style="margin-right:8px;float:right;">
+                        <div class="preCategoryLabelAdd" onclick="addNavCategoryFormDialog.show();" title="添加分类">
+                            <div class="nav-icon nav-icon-circle-plus"></div></div>
+                    </div>
+                </f:facet>
+                <div class="nav_category">
+                    <ui:repeat var="nc" value="#{navMgmt.navCategories}">
+                        <div class="categoryAccordion">
+                            <h2>
+                                <a href="#">
+                                    <label class="preCategoryLabelLink">#{nc.label}</label>
+                                    <input type="text" style="display:none;" class="preCategoryLabelInput" onblur="ignoreEdit(this);" value="#{nc.label}" />
+
+                                    <div style="margin-right:8px;float:right;">
+                                        <div class="preCategoryLabelEdit" onclick="editCategoryLabel(this);" title="编辑分类名">
+                                            <div class="nav-icon nav-icon-pencil"></div></div>
+                                        <div class="preCategoryLabelSave" style="display:none;" onclick="saveCategoryLabel(this);" title="保存">
+                                            <div class="nav-icon nav-icon-disk"></div></div>
+                                        <div class="preCategoryLabelDelete" onclick="deleteCategory(this);" title="删除分类">
+                                            <div class="nav-icon nav-icon-circle-close"></div></div>
+                                    </div>
+                                </a>
+                            </h2>
+                            <div><ol>
+                                <h:inputHidden value="#{nc.id}" />
+                            </ol></div>
+                        </div>
+                    </ui:repeat>
+                    <div class="defaultCategoryAccordion" style="display:none;">
+                        <h2>
+                            <a href="#">
+                                <label class="preCategoryLabelLink"></label>
+                                <input type="text" style="display:none;" class="preCategoryLabelInput" onblur="ignoreEdit(this);" value="" />
+                                <div style="margin-right:8px;float:right;">
+                                    <div class="preCategoryLabelEdit" onclick="editCategoryLabel(this);" title="编辑分类名">
+                                        <div class="nav-icon nav-icon-pencil"></div></div>
+                                    <div class="preCategoryLabelSave" style="display:none;" onclick="saveCategoryLabel(this);" title="保存">
+                                        <div class="nav-icon nav-icon-disk"></div></div>
+                                    <div class="preCategoryLabelDelete" onclick="deleteCategory(this);" title="删除分类">
+                                        <div class="nav-icon nav-icon-circle-close"></div></div>
+                                </div>
+                            </a>
+                        </h2>
+                        <div><ol>
+                            <h:inputHidden value="" />
+                        </ol></div>
+                    </div>
+                </div>
+            </ace:panel>
+            <ace:panel header="未归类表单" layout="block">
+                <div class="nav_form">
+                    <ul>
+                        <ui:repeat var="nf" value="#{navMgmt.navForms}">
+                            <li>
+                                <h:inputHidden value="#{nf.id}" />
+                                <h:outputText value="#{nf.formMetadata.formLabel}" />
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                </div>
+            </ace:panel>
+            <h:form class="navigationForm">
+                <input type="button" value="保存" onclick="resortCategories()" />
+                <ace:panel layout="block" id="systemNavFormPanel">
+                    <f:facet name="header">
+                        <h:outputLabel value="系统默认表单" />
+                        <div style="margin-right:8px;float:right;">
+                            <div class="preSystemNavFormAdd" onclick="newSystemNavFormDialog.show();" title="添加表单">
+                                <div class="nav-icon nav-icon-circle-plus"></div></div>
+                        </div>
+                    </f:facet>
+                    <table class="list-table" cellspacing="0">
+                        <tr>
+                            <th>id</th>
+                            <th>label</th>
+                            <th>url</th>
+                        </tr>
+                        <ui:repeat var="nf" value="#{navMgmt.systemNavForms}">
+                            <tr>
+                                <td><h:outputText class="systemNavFormId#{nf.id}" value="#{nf.id}" /></td>
+                                <td><h:outputText class="systemNavFormLabel#{nf.id}" value="#{nf.label}" /></td>
+                                <td><h:outputText class="systemNavFormUrl#{nf.id}" value="#{nf.url}" /></td>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                </ace:panel>
+
+                <ace:panel header="导航分类" layout="block" id="navCategoryPanel">
+                    <table class="list-table" cellspacing="0">
+                        <tr>
+                            <th>id</th>
+                            <th>label</th>
+                            <th>seqNumber</th>
+                            <th>account</th>
+                        </tr>
+                        <ui:repeat var="nc" value="#{navMgmt.navCategories}">
+                            <tr>
+                                <td><h:outputText class="navCategoryId#{nc.id}" value="#{nc.id}" /></td>
+                                <td><h:outputText class="navCategoryLabel#{nc.id}" value="#{nc.label}" /></td>
+                                <td><h:outputText class="navCategorySeqNumber#{nc.id}" value="#{nc.seqNumber}" /></td>
+                                <td><h:outputText class="navCategoryAccount#{nc.id}" value="#{nc.account.account}" /></td>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                </ace:panel>
+
+                <ace:panel header="导航表单" layout="block">
+                    <table class="list-table" cellspacing="0">
+                        <tr>
+                            <th>id</th>
+                            <th>label</th>
+                            <th>seqNumber</th>
+                            <th>category</th>
+                        </tr>
+                        <ui:repeat var="nf" value="#{navMgmt.navForms}">
+                            <tr>
+                                <td><h:outputText class="navFormId#{nf.id}" value="#{nf.id}" /></td>
+                                <td><h:outputText class="navFormFormMetadata#{nf.id}" value="#{nf.formMetadata.formLabel}" /></td>
+                                <td><h:outputText class="navFormSeqNumber#{nf.id}" value="#{nf.seqNumber}" /></td>
+                                <td><h:outputText class="navFormCategory#{nf.id}" value="#{nf.navCategory.id}" /></td>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                </ace:panel>
+
+                <ui:include src="dialog/new_nav_category_dialog.xhtml" />
+                <ui:include src="dialog/new_system_nav_form_dialog.xhtml" />
+            </h:form>
+        </h:panelGrid>
+    </ui:define>
+
+</ui:composition>

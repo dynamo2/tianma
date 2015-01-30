@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:ace="http://www.icefaces.org/icefaces/components"
+                xmlns:ice="http://www.icesoft.com/icefaces/component"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/layout/main_template.xhtml" xmlns:p="http://java.sun.com/jsf/html">
+
+    <ui:define name="main_block">
+        <script src="jquery/navigation.js?fff"></script>
+        <script language="javaScript">
+            $(function(){
+                initNavigation();
+            });
+
+            function completeEditRequest(event){
+                if (event.status == 'success') {
+                    addNavCategoryFormDialog.show();
+                }
+            }
+
+            function requestEditCategory(editDiv){
+                var $categoryAccordionDiv = $(editDiv).parent().parent().parent().parent();
+                var cid = $categoryAccordionDiv.children("div").children("ol").children("input").val();
+                $(".preEditCategoryId").val(cid);
+                $('.editCategoryAjaxButton').trigger('click');
+            }
+
+            function requestDeleteCategory(delDiv){
+                var $categoryAccordionDiv = $(delDiv).parent().parent().parent().parent();
+                var $liList = $categoryAccordionDiv.find("li");
+                var liLength = $liList.length;
+                var confirmMsg = "您确定要删除该分类么？";
+                if(liLength > 0){
+                    confirmMsg = "该分类下有"+liLength+"个关联表单，删除分类会解除关联关系。\n"+confirmMsg;
+                }
+
+                if(!confirm(confirmMsg)){
+                    return;
+                }
+
+                var cid = $categoryAccordionDiv.children("div").children("ol").children("input").val();
+                $(".preEditCategoryId").val(cid);
+                $('.deleteCategoryAjaxButton').trigger('click');
+
+                $liList.appendTo($(".nav_form").children("ul"));
+                $categoryAccordionDiv.remove();
+            }
+        </script>
+        <style>
+            .td-category,.td-form {
+                padding:15px 40px;
+            }
+            .nav_form {
+                width:250px;
+            }
+            .categoryAccordion {
+                width:300px;
+                zoom:1;
+            }
+
+            .categoryAccordion div{
+                padding:0px;
+            }
+
+            .categoryAccordion ol{
+                padding-top:10px;
+                padding-bottom:10px;
+            }
+
+            .nav_category li,.nav_form li {
+                border-bottom:1px dashed #cccccc;
+                line-height:200%;
+                width:150px;
+                padding-left:15px;
+            }
+
+            .list-table th {
+                padding:5px 15px;
+                border-bottom:1px #79b7e7 solid;
+                color:#2e6e9e;
+            }
+
+            .list-table td {
+                line-height:200%;
+                padding:0px 15px;
+                border-bottom:1px dashed #cccccc;
+            }
+
+            /* Icons
+            ----------------------------------*/
+
+            /* states and images */
+            .nav-icon {
+                width: 16px;
+                height: 16px;
+                content: "";
+                background-image: url(../jquery/themes/redmond/images/ui-icons_469bdd_256x240.png);
+            }
+
+            /* positioning */
+            .nav-icon-pencil { background-position: -64px -112px; }
+            .nav-icon-disk { background-position: -96px -112px; }
+            .nav-icon-circle-close { background-position: -32px -192px; }
+            .nav-icon-circle-plus { background-position: 0 -192px; }
+
+            .preCategoryLabelEdit,.preCategoryLabelSave,.preCategoryLabelDelete,.preCategoryLabelAdd{
+                float:left;
+                margin-right:5px;
+            }
+
+            .preCategoryLabelAdd{
+                border: 1px solid #c5dbec;
+                background: #dfeffc url(../jquery/themes/redmond/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
+                font-weight: bold;
+                color: #2e6e9e;
+                cursor: pointer;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+
+            .nav-state-hover{
+                border: 1px solid #79b7e7;
+                background: #d0e5f5 url(../jquery/themes/redmond/images/ui-bg_glass_75_d0e5f5_1x400.png) 50% 50% repeat-x;
+                font-weight: bold;
+                color: #1d5987;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+
+            .preCategoryLabelInput {
+                line-height:200%;
+                padding:5px;
+            }
+
+            .preCategoryLabelEdit .nav-icon{
+                border:0px;
+                background-color:transparent;
+                padding:0px;
+            }
+
+            .editCategoryAjaxButton,.deleteCategoryAjaxButton,.defaultCategoryAccordion{
+                display:none;
+            }
+        </style>
+        <h:form class="navigationForm" id="navigationForm">
+        <h:panelGrid columns="2" columnClasses="td-category,td-form">
+            <ace:panel header="导航分类" layout="block">
+                <f:facet name="header">
+                    <h:outputLabel value="导航分类" />
+                    <div style="margin-right:8px;float:right;">
+                        <div class="preCategoryLabelAdd" onclick="addNavCategoryFormDialog.show();" title="添加分类">
+                            <div class="nav-icon nav-icon-circle-plus"></div></div>
+                    </div>
+                </f:facet>
+                <div class="nav_category">
+                    <h:inputText id="preEditCategoryId" styleClass="preEditCategoryId" value="#{navMgmt.navCategoryId}" />
+                    <h:commandButton styleClass="editCategoryAjaxButton" action="#{navMgmt.loadEditNavCategory}">
+                        <f:ajax execute="preEditCategoryId" onevent="completeEditRequest" render="addNavCategoryFormDialog" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="deleteCategoryAjaxButton" action="#{navMgmt.deleteNavCategory}">
+                        <f:ajax execute="preEditCategoryId" render="navCategoryPanel" />
+                    </h:commandButton>
+
+                    <ui:repeat var="nc" value="#{navMgmt.navCategories}">
+                        <div class="categoryAccordion">
+                            <h2>
+                                <a href="#">
+                                    <label class="preCategoryLabelLink refreshCategoryLabelLink#{nc.id}">#{nc.label}</label>
+
+                                    <div style="margin-right:8px;float:right;">
+                                        <div class="preCategoryLabelEdit" title="编辑分类名" onclick="requestEditCategory(this);">
+                                            <div class="nav-icon nav-icon-pencil"></div>
+                                        </div>
+                                        <div class="preCategoryLabelDelete" onclick="requestDeleteCategory(this);" title="删除导航分类">
+                                            <div class="nav-icon nav-icon-circle-close"></div></div>
+                                    </div>
+                                </a>
+                            </h2>
+                            <div><ol>
+                                <h:inputHidden styleClass="preCategoryInput" value="#{nc.id}" />
+                                <ui:repeat var="fm" value="#{nc.formMetadatas}">
+                                    <li>
+                                        <h:inputHidden value="#{fm.id}" />
+                                        <h:outputText value="#{fm.formLabel}" />
+                                    </li>
+                                </ui:repeat>
+                            </ol></div>
+                        </div>
+                    </ui:repeat>
+                    <div class="defaultCategoryAccordion">
+                        <h2>
+                            <a href="#">
+                                <label class="preCategoryLabelLink"></label>
+                                <div style="margin-right:8px;float:right;">
+                                    <div class="preCategoryLabelEdit" onclick="requestEditCategory(this);" title="编辑分类名">
+                                        <div class="nav-icon nav-icon-pencil"></div></div>
+                                    <div class="preCategoryLabelDelete" onclick="requestDeleteCategory(this);" title="删除分类">
+                                        <div class="nav-icon nav-icon-circle-close"></div></div>
+                                </div>
+                            </a>
+                        </h2>
+                        <div><ol>
+                            <h:inputHidden styleClass="preCategoryInput" value="" />
+                        </ol></div>
+                    </div>
+                </div>
+            </ace:panel>
+            <ace:panel header="未归类表单" layout="block">
+                <div class="nav_form">
+                    <ul>
+                        <ui:repeat var="ufm" value="#{navMgmt.uncategorizedFormMetadatas}">
+                            <li>
+                                <h:inputHidden value="#{ufm.id}" />
+                                <h:outputText value="#{ufm.formLabel}" />
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                </div>
+            </ace:panel>
+
+                <ace:panel header="导航分类" layout="block" id="navCategoryPanel">
+                    <h:commandButton styleClass="saveAllButton"
+                                     action="#{navMgmt.saveAll}" onclick="resortCategories();return true;" value="保存">
+                        <ace:ajax execute="@form" render="navigationForm"/>
+                    </h:commandButton>
+                    <h:inputHidden id="newNavCategoryId" class="newNavCategoryId" value="#{navMgmt.newNavCategoryId}" />
+
+                    <table class="list-table" cellspacing="0">
+                        <tr>
+                            <th>id</th>
+                            <th>label</th>
+                            <th>seqNumber</th>
+                        </tr>
+                        <ui:repeat var="nc" value="#{navMgmt.navCategories}">
+                            <tr>
+                                <td><h:inputText id="navCategoryId#{nc.id}" class="navCategoryId#{nc.id}" value="#{nc.id}" /></td>
+                                <td><h:inputText id="navCategoryLabel#{nc.id}" class="navCategoryLabel#{nc.id}" value="#{nc.label}" /></td>
+                                <td><h:inputText id="navCategorySeqNumber#{nc.id}" class="navCategorySeqNumber#{nc.id}" value="#{nc.seqNumber}" /></td>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                </ace:panel>
+
+                <ace:panel header="导航表单" layout="block">
+                    <table class="list-table" cellspacing="0">
+                        <tr>
+                            <th>id</th>
+                            <th>label</th>
+                            <th>seqNumber</th>
+                            <th>category</th>
+                        </tr>
+                        <ui:repeat var="fm" value="#{navMgmt.publishedFormMetadataList}">
+                            <tr>
+                                <td><h:inputText id="navFormId#{fm.id}" class="navFormId#{fm.id}" value="#{fm.id}" /></td>
+                                <td><h:inputText id="navFormFormMetadata#{fm.id}" class="navFormFormMetadata#{fm.id}" value="#{fm.formLabel}" /></td>
+                                <td><h:inputText id="navFormSeqNumber#{fm.id}" class="navFormSeqNumber#{fm.id}" value="#{fm.seqNumber}" /></td>
+                                <td><h:inputText id="navFormCategory#{fm.id}" class="navFormCategory#{fm.id}" value="#{fm.navCategoryId}" /></td>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                </ace:panel>
+
+                <ui:include src="dialog/new_nav_category_dialog.xhtml" />
+
+        </h:panelGrid>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

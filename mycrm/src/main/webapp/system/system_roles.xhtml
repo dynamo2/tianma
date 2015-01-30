@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ice="http://www.icesoft.com/icefaces/component"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+		<h:form id="systemRoleForm">
+			<ace:panel id="roleEditor" header="#{i18n.role}" toggleable="true" collapsed="#{roleMgmt.roleEditorCollapsed}">
+				<h:panelGroup layout="block">
+					<h:outputLabel value="#{i18n.name}: " for="roleName" />
+					<h:inputText id="roleName" value="#{roleMgmt.role.roleName}"
+						required="true" requiredMessage="#{i18n.validationRequired}"
+						validator="#{roleMgmt.validateRoleName}" 
+						readonly="#{roleMgmt.forEdit}" >
+						<f:validateRegex pattern="ROLE_[A-Z_]*" />
+					</h:inputText>
+					<h:message for="roleName" />
+				</h:panelGroup>
+
+				<h:panelGrid columns="1">
+					<h:outputLabel value="#{i18n.permissions}" for="permissions" />
+					<h:panelGroup layout="block" style="width:600px; height:400px; overflow:auto;">
+						<h:selectManyCheckbox id="permissions"
+							value="#{roleMgmt.role.permissionList}" layout="pageDirection">
+							<f:selectItems id="permissionItems"
+								value="#{selectionItems.permissionItems}" />
+						</h:selectManyCheckbox>
+					</h:panelGroup>
+				</h:panelGrid>
+
+				<h:panelGrid columns="2">
+					<h:commandButton action="#{roleMgmt.save}" value="#{i18n.save}">
+						<f:ajax execute="roleName permissions" render="@form" />
+					</h:commandButton>
+					
+					<h:commandButton action="#{roleMgmt.cancelEdit}" value="#{i18n.cancel}" rendered="#{roleMgmt.forEdit}">
+						<f:ajax execute="@this" render="@form" />
+					</h:commandButton>
+				</h:panelGrid>
+			</ace:panel>
+
+			<ace:panel header="#{i18n.role_list}" toggleable="true"
+				collapsed="false" id="roleListPanel">
+
+				<ace:dataTable id="roleList" value="#{roleMgmt.roleList}" var="role"
+					emptyMessage="#{i18n.noData}">
+
+					<ace:column headerText="#{i18n.name}">
+						<h:outputText value="#{role.roleName}" converter="tokenToLabelConverter"/>
+					</ace:column>
+
+					<ace:column headerText="#{i18n.permissions}">
+						<div style="text-align: left;">
+						<ui:repeat var="per" value="#{role.permissionList}">
+							<h:outputText value="#{i18n[per]}" /><br/>
+						</ui:repeat>
+						</div>
+					</ace:column>
+
+					<ace:column headerText="#{i18n.lastModifiedBy}">
+						<h:outputText value="#{role.lastModifiedBy}" converter="accountToDisplayNameConverter"/>
+					</ace:column>
+
+					<ace:column headerText="">
+						<nobr> 
+						<h:commandLink action="#{roleMgmt.selectRole4Edit}" value="#{i18n.edit}">
+							<f:ajax execute="@this" render=":systemRoleForm:roleEditor"/>
+							<f:param name="roleName" value="#{role.roleName}" />
+						</h:commandLink>
+						<fount> | </fount>
+						<h:commandLink action="#{roleMgmt.deleteRole}" value="#{i18n.delete}" onclick="return confirm('#{i18n.confirm}');">
+							<f:ajax execute="@this" render=":systemRoleForm:roleListPanel"/>
+							<f:param name="roleName" value="#{role.roleName}" />
+						</h:commandLink>   
+						</nobr>
+					</ace:column>
+				</ace:dataTable>
+
+			</ace:panel>
+
+			<h:messages id="formMessage" showDetail="true" />
+		</h:form>
+	</ui:define>
+
+</ui:composition>

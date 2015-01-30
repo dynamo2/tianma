@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+			
+		<f:metadata>
+			<f:viewParam name="id" value="#{formMetadataMgmtBean.formMetadataId}" />
+		</f:metadata>
+		
+		<h:form id="dynamicFormConfigForm">		
+			<h:message for="dynamicFormConfigForm" infoStyle="color: blue;" errorStyle="display: none;" warnStyle="color: yellow"/>
+
+            <ui:include src="dialog/preview_dialog.xhtml" />
+            <ui:include src="dialog/new_field_dialog.xhtml" />
+			<ui:include src="form_config_work_flow_step_inc.xhtml" />
+
+			<ace:panel id="formMetadataPanel" header="#{i18n.formConfigPanel}">
+				<ace:menuBar id="formMetadataNenu">
+					<ace:menuItem value="#{i18n.save}" icon="ui-icon ui-icon-disk"
+						action="#{formMetadataMgmtBean.saveFormMetadata}" >
+						<ace:ajax execute="formName formLabel formLanguage formStatus formShortName formCreatable formReadable formWritable formRemovable formCategory"
+							render="formMetadataPanel formFieldListPanel" />
+					</ace:menuItem>
+				</ace:menuBar>
+				<h:panelGrid id="formMetadataPanelGrid" columns="5">
+					<h:panelGrid id="formMetadataPanelGridBasic" columns="3">
+						<h:outputText value="#{i18n.from_cfgFormName}" for="formName" />
+						<h:inputText id="formName"
+							value="#{formMetadataMgmtBean.formMetadata.formName}" readonly="#{formMetadataMgmtBean.formMetadata.id > 0}">
+							<f:validateRequired />
+							<f:validateRegex pattern="[a-zA-Z_0-9]*" />
+							<f:validator validatorId="dynamicFormNameValidator"/>
+						</h:inputText>
+						<h:message for="formName" style="color:red;" />
+						
+						<h:outputText value="#{i18n.form_formShortName}" for="formShortName" />
+						<h:inputText id="formShortName"
+							value="#{formMetadataMgmtBean.formMetadata.formShortName}"
+							readonly="#{not formMetadataMgmtBean.editable}">
+							<f:validateRequired />
+						</h:inputText>
+						<h:message for="formShortName" style="color:red;" />
+	
+						<h:outputText value="#{i18n.form_formLabel}" for="formLabel" />
+						<h:inputText id="formLabel"
+							value="#{formMetadataMgmtBean.formMetadata.formLabel}"
+							readonly="#{not formMetadataMgmtBean.editable}">
+							<f:validateRequired />
+						</h:inputText>
+						<h:message for="formLabel" style="color:red;" />
+	
+						<h:outputText value="#{i18n.form_category}" for="formCategory" />
+						<h:selectOneMenu id="formCategory"
+							value="#{formMetadataMgmtBean.formMetadata.formCategory}" readonly="#{not formMetadataMgmtBean.editable}">
+							<f:selectItems value="#{dynamicFormSelectionItems.formCategories}" />
+						</h:selectOneMenu>
+						<h:message for="formCategory" style="color:red;" />
+						
+	
+						<h:outputText value="#{i18n.language}" for="formLanguage" />
+						<h:selectOneMenu id="formLanguage"
+							value="#{formMetadataMgmtBean.formMetadata.formLanguage}" readonly="#{not formMetadataMgmtBean.editable}">
+							<f:selectItems value="#{selectionItems.languageItems}" />
+						</h:selectOneMenu>
+						<h:message for="formLanguage" style="color:red;" />
+						
+						<h:outputText value="#{i18n.status}" for="formStatus" />
+						<h:selectOneMenu id="formStatus"
+							value="#{formMetadataMgmtBean.formMetadata.formStatus}">
+							<f:selectItems value="#{dynamicFormSelectionItems.formStatus}" />
+						</h:selectOneMenu>
+						<h:message for="formStatus" style="color:red;" />
+					</h:panelGrid>
+					<h:panelGroup layout="block">
+						<h:outputText value="#{i18n.form_creatable}" for="formCreatable" /><br/>
+						<h:selectManyListbox id="formCreatable"
+							value="#{formMetadataMgmtBean.formMetadata.canCreateAccounts}">
+							<f:selectItems value="#{systemAccountMgmt.allAccounts}" var="acct" itemLabel="#{acct.accountName}" itemValue="#{acct.account}"/>
+						</h:selectManyListbox>
+					</h:panelGroup>
+					<h:panelGroup layout="block">
+						<h:outputText value="#{i18n.form_readable}" for="formReadable" /><br/>
+						<h:selectManyListbox id="formReadable"
+							value="#{formMetadataMgmtBean.formMetadata.canReadAccounts}">
+							<f:selectItems value="#{systemAccountMgmt.allAccounts}" var="acct" itemLabel="#{acct.accountName}" itemValue="#{acct.account}"/>
+						</h:selectManyListbox>
+					</h:panelGroup>
+					<h:panelGroup layout="block">
+						<h:outputText value="#{i18n.form_writable}" for="formWritable" /><br/>
+						<h:selectManyListbox id="formWritable"
+							value="#{formMetadataMgmtBean.formMetadata.canWriteAccounts}">
+							<f:selectItems value="#{systemAccountMgmt.allAccounts}" var="acct" itemLabel="#{acct.accountName}" itemValue="#{acct.account}"/>
+						</h:selectManyListbox>
+					</h:panelGroup>
+					<h:panelGroup layout="block">
+						<h:outputText value="#{i18n.form_removable}" for="formRemovable" /><br/>
+						<h:selectManyListbox id="formRemovable"
+							value="#{formMetadataMgmtBean.formMetadata.canRemoveAccounts}">
+							<f:selectItems value="#{systemAccountMgmt.allAccounts}" var="acct" itemLabel="#{acct.accountName}" itemValue="#{acct.account}"/>
+						</h:selectManyListbox>
+					</h:panelGroup>
+				</h:panelGrid>
+				<h:message for="formMetadataPanelGrid" style="color:red;" />
+			</ace:panel>
+
+			<ace:panel id="formFieldListPanel" header="#{i18n.formFieldList}">
+				<ace:menuBar id="formFieldListNenu"
+					rendered="#{formMetadataMgmtBean.formMetadata.id > 0}" style="border:0px;">
+					<ace:menuItem value="#{i18n._new}" icon="ui-icon ui-icon-document"
+						onclick="newFieldDialog.show();" />
+						
+					<ace:menuItem value="#{i18n.formPreview}" icon="ui-icon ui-icon-document" action="#{formMetadataMgmtBean.preview}">
+						<ace:ajax onSuccess="previewDialog.show()" execute="@this" render="previewDialog"/>
+					</ace:menuItem>
+				</ace:menuBar>
+				
+				<div style="width:98%; overflow: auto;">
+					<ace:dataTable id="formFieldMetadataList"
+						value="#{formMetadataMgmtBean.formFieldMetadataList}" var="field"
+						emptyMessage="#{i18n.noData}">
+	
+						<ace:column headerText="#{i18n.form_fieldName}">
+							<h:outputText value="#{field.fieldName}" />
+						</ace:column>
+						<ace:column headerText="#{i18n.form_fieldType}">
+							<h:outputText value="#{field.fieldType}" />
+						</ace:column>
+						<ace:column headerText="#{i18n.form_fieldLabel}">
+							<h:outputText value="#{field.fieldLabel}" />
+						</ace:column>
+						<ace:column headerText="#{i18n.form_fieldPosition}(组|行|列)">
+						<nobr>
+							<h:outputText value="#{field.displayPositionGroup} | " />
+							<h:outputText value="#{field.displayPositionRow} | " />
+							<h:outputText value="#{field.displayPositionColumn}" />
+						</nobr>
+						</ace:column>
+						<ace:column headerText="#{i18n.form_inputRowColumn}">
+						<nobr>
+							<h:outputText value="#{field.inputRows} | #{field.inputColumns}" />
+						</nobr>
+						</ace:column>
+						<ace:column headerText="#{i18n.form_fieldColumn}">
+							<h:outputText value="#{field.columnName}" />
+						</ace:column>
+						<ace:column headerText="#{i18n.form_fieldExpression}">
+							<h:panelGroup layout="block" rendered="#{not empty field.expression}">
+								<h:outputText value="exp = #{field.expression}" /><br/>
+								<h:outputText value="Label = #{field.expressionLabel}" />
+							</h:panelGroup>
+						</ace:column>
+                        <ace:column headerText="#{i18n.form_fieldIsLabel}">
+                            <h:outputText value="#{field.isLabel}" />
+                        </ace:column>
+                        <ace:column headerText="#{i18n.form_fieldIsRequired}">
+							<h:outputText value="#{field.isRequired}" />
+						</ace:column>
+						<ace:column headerText="#{i18n.form_fieldIsPrintable}">
+							<h:outputText value="#{field.isPrintable}" />
+						</ace:column>
+						<ace:column headerText="#{i18n.form_fieldReferTo}">
+							<h:outputText value="#{field.referToFormMetadataId}"/>
+						</ace:column>
+						<ace:column>
+							<h:panelGroup rendered="#{formMetadataMgmtBean.editable}">
+								<nobr>
+								<h:commandLink action="#{formMetadataMgmtBean.delFieldById}"
+									onclick="return confirm('#{i18n.confirm}');"
+									value="#{i18n.delete}">
+									<f:ajax execute="formFieldMetadataList" render="@form" />
+									<f:param name="delFieldId" value="#{field.id}" />
+								</h:commandLink>
+								<h:outputText value=" | " />
+								<h:commandLink action="#{formMetadataMgmtBean.editFieldById}"
+									value="#{i18n.edit}">
+									<f:ajax execute="formFieldMetadataList" render="@form" onevent="ajaxEventFormConfigFieldEdit"/>
+									<f:param name="fieldId" value="#{field.id}" />
+								</h:commandLink>
+								</nobr>
+							</h:panelGroup>
+						</ace:column>
+					</ace:dataTable>
+				</div>
+			</ace:panel>
+
+			<ui:include src="form_config_work_flow_step_list_inc.xhtml" />
+
+			<h:messages id="formMessage" showDetail="true" />
+		</h:form>
+	</ui:define>
+
+</ui:composition>

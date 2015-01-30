@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:ace="http://www.icefaces.org/icefaces/components"
+                xmlns:ice="http://www.icesoft.com/icefaces/component"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:composite="http://java.sun.com/jsf/composite">
+
+<composite:interface>
+    <composite:attribute name="formName" />
+    <composite:attribute name="bean" />
+</composite:interface>
+
+<composite:implementation>
+    <script>
+        $(function() {
+        var availableTags = [
+        <c:forEach items="${customersList.allCustomers}" var="c">
+            '${c.name}',
+        </c:forEach>
+        ''
+        ];
+
+        $(".customer_name_input").autocomplete({
+        source: availableTags
+        });
+        });
+    </script>
+
+    <h:inputText styleClass="customer_name_input" id="order_customer_name" value="#{cc.attrs.bean.customer.name}" style="width:400px;"  />
+    <h:outputLink value="#" onclick="customerListDialog.show();">
+        <h:graphicImage url="/icons/s.gif" height="16" width="16" style="margin-left:5px;" />
+    </h:outputLink>
+    <ui:include src="/order/dialog/customer_list_dialog.xhtml" />
+</composite:implementation>
+</html>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.hsarz.com" />
+		<property name="username" value="system@hsarz.com" />
+		<property name="password" value="abc369852" />
+		<property name="port" value="587" />
+		<property name="javaMailProperties">
+			<props>				
+	            <prop key="mail.smtp.timeout">50000</prop>
+	            <prop key="mail.smtp.auth">true</prop>
+	            <prop key="mail.smtp.starttls.enable">true</prop>
+	            <prop key="mail.smtp.socketFactory.port">587</prop>
+	            <prop key="mail.smtp.socketFactory.fallback">false</prop>
+			</props>
+		</property>
+		
+	</bean>
+
+	<bean id="mailSenderBBean" class="com.dynamo2.myerp.dynamicform.service.MailSenderBBean">
+	</bean>
+
+
+	<!--<bean id="scheduledTask" class="org.springframework.scheduling.timer.ScheduledTimerTask">-->
+		<!--&lt;!&ndash; wait 10 seconds before starting repeated execution &ndash;&gt;-->
+		<!--<property name="delay" value="10000" />-->
+		<!--&lt;!&ndash; run every 10 seconds &ndash;&gt;-->
+		<!--<property name="period" value="10000" />-->
+		<!--&lt;!&ndash;-->
+			<!--Refer to com.mfg.cn.discountmgmttool.service.impl.MailServiceImpl-->
+		<!--&ndash;&gt;-->
+		<!--<property name="timerTask" ref="mailSenderBBean" />-->
+	<!--</bean>-->
+
+	<!--<bean id="timerFactory" class="org.springframework.scheduling.timer.TimerFactoryBean"-->
+		<!--lazy-init="false">-->
+		<!--<property name="scheduledTimerTasks">-->
+			<!--<list>-->
+				<!--<ref bean="scheduledTask" />-->
+			<!--</list>-->
+		<!--</property>-->
+	<!--</bean>-->
+
+	<bean id="velocityEngine"
+		class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="velocityProperties">
+			<value>
+				resource.loader=class
+				class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+			</value>
+		</property>
+	</bean>
+</beans>

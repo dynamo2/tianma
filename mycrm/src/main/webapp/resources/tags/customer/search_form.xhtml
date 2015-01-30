@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:ace="http://www.icefaces.org/icefaces/components"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:composite="http://java.sun.com/jsf/composite">
+
+<composite:interface>
+    <composite:attribute name="searchRender" />
+</composite:interface>
+
+<composite:implementation>
+    <h:form id="customerSearchForm">
+        <ace:panel header="#{i18n.search}" toggleable="true">
+            <h:panelGrid columns="6">
+                <h:outputLabel value="#{i18n.customerId}" for="customerId"/>
+                <h:inputText id="customerId"
+                             value="#{customersList.customer.customerId}"/>
+
+                <h:outputLabel value="#{i18n.name}" for="customerName"/>
+                <h:inputText id="customerName"
+                             value="#{customersList.customer.name}"/>
+
+                <h:outputLabel value="#{i18n.type}" for="customerType"/>
+                <h:inputText id="customerType"
+                             value="#{customersList.customer.type}"/>
+
+                <h:outputLabel value="#{i18n.industry}" for="customerIndustry"/>
+                <h:inputText id="customerIndustry"
+                             value="#{customersList.customer.industry}"/>
+
+                <h:outputLabel value="#{i18n.quality}" for="customerQuality"/>
+                <h:selectOneMenu id="customerQuality"
+                                 value="#{customersList.customer.quality}"
+                                 readonly="#{editable eq 'false'}">
+                    <f:selectItem itemLabel="#{i18n.all}" itemValue=" "/>
+                    <f:selectItems id="customerQualityItems" value="#{selectionItems.customerQualityItems}"/>
+                </h:selectOneMenu>
+
+                <h:outputLabel value="#{i18n.city}" for="customerCity"/>
+                <h:inputText id="customerCity"
+                             value="#{customersList.customer.city}"/>
+
+                <h:outputLabel value="#{i18n.area}" for="customerArea"/>
+                <h:inputText id="customerArea"
+                             value="#{customersList.customer.area}"/>
+            </h:panelGrid>
+            <h:commandButton action="#{customersList.search}"
+                             value="#{i18n.search}">
+                <f:ajax
+                        execute="customerId customerName customerType customerIndustry customerQuality customerCity customerArea"
+                        render="searchRenderPanel"/>
+            </h:commandButton>
+        </ace:panel>
+
+
+        <h:panelGroup id="searchRenderPanel">
+            <composite:renderFacet name="searchRender" />
+        </h:panelGroup>
+
+    </h:form>
+</composite:implementation>
+</html>

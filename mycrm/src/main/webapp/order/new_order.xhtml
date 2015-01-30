@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:customer="http://java.sun.com/jsf/composite/tags/customer"
+	template="/layout/main_template.xhtml">
+
+	<ui:define name="main_block">
+
+		<f:metadata>
+			<f:viewParam name="id" value="#{orderMgmtBean.orderId}" />
+			<f:viewParam name="customerId" value="#{orderMgmtBean.customerId}" />
+			<f:viewParam name="formMetadataId" value="#{orderMgmtBean.formMetadataId}" />
+			<f:viewParam name="parentFormRecordId" value="#{orderMgmtBean.parentFormRecordId}" />
+			<f:viewParam name="parentFormFieldColumnName" value="#{orderMgmtBean.parentFormFieldColumnName}" />
+			<f:viewParam name="formBizKey" value="#{orderMgmtBean.formBizKey}" />
+		</f:metadata>
+
+		<h:outputText value="#{i18n.accessForbidden}" rendered="#{not orderMgmtBean.readable}"/>
+
+		<h:form id="newOrderForm" rendered="#{orderMgmtBean.readable}" style="margin-bottom:100px;" prependId="false">
+
+            <ui:include src="dialog/order_change_status_dialog.xhtml" />
+            <ui:include src="dialog/order_assign_to_dialog.xhtml" />
+			
+			<ace:dialog id="formAuditLogDialog" header="#{i18n.formAuditLogDialog}"
+				widgetVar="formAuditLogDialog" closable="true" modal="true"
+				draggable="true" showEffect="clip" hideEffect="fade"
+				resizable="true" rendered="#{orderMgmtBean.orderId > 0}" width="1000" height="300">
+				
+				<ace:dataTable id="formAuditLogDataTable"
+					value="#{orderMgmtBean.formAuditLog}" var="log" emptyMessage="#{i18n.noData}">
+					<ace:column headerText="#{i18n.created}">
+						<h:outputText value="#{log.created}" />
+					</ace:column>
+					<ace:column headerText="#{i18n.operator}">
+						<h:outputText value="#{log.account}" converter="accountToDisplayNameConverter" />
+					</ace:column>
+					<ace:column headerText="#{i18n.operation}">
+						<h:outputText value="#{log.operation}" converter="tokenToLabelConverter" />
+					</ace:column>
+					<ace:column headerText="#{i18n.log}">
+						<h:outputText value="#{log.plainLog}" />
+					</ace:column>
+				</ace:dataTable>
+				
+			</ace:dialog>
+			
+			<c:if test="#{(orderMgmtBean.orderId eq null) or (orderMgmtBean.orderId eq 0) }">
+			
+			<ace:panel header="#{i18n.from_cfgFormName}">
+				<h:panelGroup layout="block">
+					<h:outputLabel value="#{i18n.from_cfgFormName}" for="formSelection" />
+					<h:selectOneMenu id="formSelection"
+						value="#{orderMgmtBean.formMetadataId}" >
+						<f:selectItem itemValue="0" itemLabel="#{i18n.pleaseSelectOne}"/>
+						<f:selectItems value="#{orderMgmtBean.publishedCreatableFormMetadataList}"
+							var="form" itemValue="#{form.id}" itemLabel="#{form.formLabel}" />
+						<f:ajax execute="formSelection" render="@form" listener="#{orderMgmtBean.swithForm}"/>
+					</h:selectOneMenu>
+				</h:panelGroup>
+			</ace:panel>
+			
+			</c:if>
+			
+			<ace:panel id="orderInfo" header="#{i18n.newOrderForm}" rendered="#{orderMgmtBean.groupedFields ne null}" toggleable="true">
+				<ace:menuBar id="formMetadataNenu">
+					<ace:menuItem id="saveOrderMenuItem" value="#{i18n.save}"
+							action="#{orderMgmtBean.saveOrder}" rendered="#{orderMgmtBean.savable}" >
+							<ace:ajax execute="@form" render="orderInfo formSheetPanelGroup"/>
+					</ace:menuItem>
+					
+					<ace:submenu label="#{i18n.form_workflow_actions}" rendered="#{not orderMgmtBean.froze and orderMgmtBean.editable}">
+						<ace:menuItem action="#{orderMgmtBean.workFlowApprove}" value="#{i18n.form_workflow_approve}" 
+							rendered="#{orderMgmtBean.workFlowApprovable}">
+							<ace:ajax execute="@this" render="orderInfo"/>
+						</ace:menuItem>
+						
+						<ace:menuItem action="#{orderMgmtBean.workFlowReject}" value="#{i18n.form_workflow_reject}"
+							rendered="#{orderMgmtBean.workFlowRejectable}">
+							<ace:ajax execute="@this" render="orderInfo"/>
+						</ace:menuItem>
+						
+						<ace:menuItem action="#{orderMgmtBean.workFlowBack}" value="#{i18n.form_workflow_back}"
+							rendered="#{orderMgmtBean.workFlowBackable}">
+							<ace:ajax execute="@this" render="orderInfo"/>
+						</ace:menuItem>
+						
+						<ace:menuItem action="#{orderMgmtBean.workFlowEnd}" value="#{i18n.form_workflow_end}"
+							rendered="#{orderMgmtBean.workFlowEndable}">
+							<ace:ajax execute="@this" render="orderInfo"/>
+						</ace:menuItem>
+						
+						<ace:menuItem action="#{orderMgmtBean.workFlowInvalid}" value="#{i18n.form_workflow_invalid}"
+							rendered="#{not orderMgmtBean.froze}">
+							<ace:ajax execute="@this" render="orderInfo"/>
+						</ace:menuItem>
+					</ace:submenu>
+					
+					<ace:submenu label="#{i18n.form_management}" rendered="#{systemAccountMgmt.haveChildren}">
+						<ace:menuItem value="#{i18n.orderAssignTo}"
+							 onclick="orderAssignToDialog.show();" />
+							 
+						<ace:menuItem value="#{i18n.orderChangeStatus}"
+							 onclick="orderChangeStatusDialog.show();" />
+							 
+		 			</ace:submenu>
+					
+					<ace:menuItem value="#{i18n.formAuditLogDialog}"
+							 onclick="formAuditLogDialog.show();" />
+							 
+					<ace:menuItem value="#{i18n.printReview}" url="#{orderMgmtBean.printReviewPage}" target="_blank"
+					 	rendered="#{not empty orderMgmtBean.order}" />
+					
+				</ace:menuBar>
+				
+				<h:panelGroup layout="block">
+					<h:panelGrid columns="4">
+						<h:outputLabel value="#{i18n.orderAssigneeAccount}" />
+						<h:outputText value="#{orderMgmtBean.order.assigneeAccount}" readonly="true" converter="accountToDisplayNameConverter"/>
+						
+						<h:outputLabel value="#{i18n.status}" />
+						<h:outputText value="#{orderMgmtBean.order.status}" converter="formWorkFlowStatusNameToLabelConverter"  readonly="true"/>
+						
+						<h:outputLabel value="#{i18n.created}" />
+						<h:outputText value="#{orderMgmtBean.order.created}" readonly="true">
+							<f:convertDateTime type="both" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+						</h:outputText>
+						
+						<h:outputLabel value="#{i18n.createdBy}" />
+						<h:outputText value="#{orderMgmtBean.order.createdBy}" readonly="true" converter="accountToDisplayNameConverter" />
+						
+						<h:outputLabel value="#{i18n.lastModified}" />
+						<h:outputText value="#{orderMgmtBean.order.lastModified}" readonly="true">
+							<f:convertDateTime type="both" timeZone="#{appSessionParams.timezone}" locale="#{appSessionParams.locale}"/>
+						</h:outputText>
+						
+						<h:outputLabel value="#{i18n.lastModifiedBy}" />
+						<h:outputText value="#{orderMgmtBean.order.lastModifiedBy}"  readonly="true" converter="accountToDisplayNameConverter"/>
+						
+						<h:outputLabel value="#{i18n.form_fieldReferTo}" rendered="#{not empty orderMgmtBean.order.parentFormBizId}"/>
+						<h:link outcome="../order/new_order.jsf?formBizKey=#{orderMgmtBean.order.parentFormBizId}"
+							rendered="#{not empty orderMgmtBean.order.parentFormBizId}"
+							target="_self">
+							<h:outputText value="#{orderMgmtBean.order.parentFormBizId}" converter="formRecordBizKeyToSummaryConverter" />
+						</h:link>
+						
+						<h:message for="saveOrderMenuItem" style="color:red;" />
+					</h:panelGrid>
+				
+					<h:panelGrid columns="3">
+						<h:outputLabel for="order_customer_name" value="#{i18n.customer_name}" />
+						<h:panelGroup>
+                        <c:choose>
+							<c:when test="#{not empty orderMgmtBean.order.customerId}">
+								<h:outputLink value="../customer/customer_mgmt.jsf?id=#{orderMgmtBean.order.customerId}">
+									<h:outputText id="order_customer_name" value="#{orderMgmtBean.order.customerId}" converter="customerNameAndIdConverter" size="100"  />
+								</h:outputLink>
+							</c:when>
+							<c:otherwise>
+								<!--<h:inputText id="order_customer_name" value="#{orderMgmtBean.order.customerId}" converter="customerNameAndIdConverter" size="100"  />-->
+
+                                <customer:input bean="#{orderMgmtBean}" formName="newOrderForm" />
+							</c:otherwise>
+						</c:choose>
+                        </h:panelGroup>
+                        <h:message for="order_customer_name" style="color:red;" />
+						
+						<h:outputLabel for="order_summary" value="#{i18n.summary}" />
+						<h:inputTextarea id="order_summary" value="#{orderMgmtBean.order.summary}" rows="5" cols="100" required="true" requiredMessage="#{i18n.validationRequired}">
+							<f:validateLength maximum="100" />
+						</h:inputTextarea>
+						<h:message for="order_summary" style="color:red;" />
+					</h:panelGrid>
+				</h:panelGroup>
+
+                <ui:include src="../inc/order_form_inc.xhtml">
+
+                    <ui:param name="groupedFields" value="#{orderMgmtBean.groupedFields}" />
+                    <ui:param name="formMetadata" value="#{orderMgmtBean.formMetadata}" />
+                    <ui:param name="columnValueMap" value="#{orderMgmtBean.columnValue}" />
+                    <ui:param name="customerId" value="#{orderMgmtBean.order.customerId}" />
+                    <ui:param name="formRecordId" value="#{orderMgmtBean.order.id}" />
+                    <ui:param name="groupView" value="#{orderMgmtBean.groupView}" />
+                </ui:include>
+				
+			</ace:panel>
+			<c:if test="#{not empty orderMgmtBean.order.id}">
+			<ace:panel header="#{i18n.fileupload}" toggleable="true">
+				<h:link outcome="/inc/file_upload.jsf"
+						value="#{i18n.fileupload}" target="_self">
+						<f:param name="returnUrl" value="/order/new_order.jsf?id=#{orderMgmtBean.order.id}"/>
+						<f:param name="customerId" value="#{orderMgmtBean.order.customerId}" />
+						<f:param name="forType" value="FORM" />
+						<f:param name="forId" value="#{orderMgmtBean.order.id}" />
+				</h:link>
+
+				<ace:dataTable id="fileList" value="#{orderMgmtBean.attachedFiles}"
+					var="f" emptyMessage="#{i18n.noData}">
+					<ace:column headerText="#{i18n.filename}">
+						<h:outputLink value="#{f.fileDownloadUrl}" target="_blank">
+							<h:outputText value="#{f.filename}" />
+						</h:outputLink>
+					</ace:column>
+					
+					<ace:column headerText="#{i18n.comments}">
+						<h:outputText
+							value="#{f.comments}" />
+					</ace:column>
+					
+					<ace:column headerText="#{i18n.keywords}">
+						<h:outputText
+							value="#{f.keywords}" />
+					</ace:column>
+					
+					<ace:column headerText="#{i18n.created}">
+						<h:outputText
+							value="#{f.created}" />
+					</ace:column>
+					
+					<ace:column headerText="#{i18n.createdBy}">
+						<h:outputText
+							value="#{f.createdBy}" />
+					</ace:column>
+				</ace:dataTable>
+			</ace:panel>
+			</c:if>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

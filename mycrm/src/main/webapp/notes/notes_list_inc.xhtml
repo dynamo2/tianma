@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:fragment xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ice="http://www.icesoft.com/icefaces/component"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<ace:dataTable id="notesList" value="#{notesList}" var="note" emptyMessage="#{i18n.noData}">
+		<ace:column headerText="#{i18n.notes_for_role}">
+			<h:outputText value="#{note.forRoleName}" converter="tokenToLabelConverter" />
+		</ace:column>
+		<ace:column headerText="#{i18n.notes}">
+			<h:outputText value="#{note.notes}" />
+		</ace:column>
+		<ace:column headerText="#{i18n.created}">
+			<h:outputText value="#{note.createdBy}[#{note.created}]" />
+		</ace:column>
+	</ace:dataTable>
+</ui:fragment>
