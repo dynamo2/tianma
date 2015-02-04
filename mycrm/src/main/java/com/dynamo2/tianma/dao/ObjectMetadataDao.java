@@ -109,6 +109,7 @@ public class ObjectMetadataDao  extends AbstractDao {
 		
 		BasicDBObject incKey = new BasicDBObject(parentKey+".$",1);
 		List<DBObject> results = this.dbColl.find(doc,incKey).toArray();
+		
 		if(results.size() == 0)return false;
 		
 		BasicDBObject result = (BasicDBObject)results.get(0);
