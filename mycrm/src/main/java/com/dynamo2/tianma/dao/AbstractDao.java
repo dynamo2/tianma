@@ -11,12 +11,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import com.dynamo2.tianma.model.MongodbModel;
+import com.dynamo2.tianma.model.ObjectField;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 public class AbstractDao  {
@@ -37,6 +41,10 @@ public class AbstractDao  {
 		return db.getCollection("object_metadata");
 	}
 	
+	protected BasicDBObject getObjectId(String oid){
+		return new BasicDBObject("_id",new ObjectId(oid));
+	}
+	
 	protected <T> List<T> readCursor(DBCursor cursor,Class<T> cls){
 		List<T> result = new ArrayList<T>();
 		while(cursor.hasNext()){
@@ -54,8 +62,10 @@ public class AbstractDao  {
 			
 			for(PropertyDescriptor pd : pds){
 				String dbName = SpellUtil.toUnderlineName(pd.getName());
-				if(!dbObj.containsField(dbName))continue;
+				if(dbName.equalsIgnoreCase("id"))dbName = "_id";
 				
+				if(!dbObj.containsField(dbName))continue;
+
 				Object value = dbObj.get(dbName);
 				if(value instanceof BasicDBObject){
 					value = decode((BasicDBObject)value,pd.getPropertyType());
@@ -68,6 +78,10 @@ public class AbstractDao  {
 					}
 					
 					value = vlist;
+				}
+				
+				if(pd.getName().equalsIgnoreCase("id")){
+					value = dbObj.getObjectId("_id");
 				}
 				
 				pd.getWriteMethod().invoke(result,value);
@@ -93,7 +107,12 @@ public class AbstractDao  {
 	            	
 	            	try {
 	            		Object value = pd.getReadMethod().invoke(obj);
-	            		if(value instanceof MongodbModel){
+	            		
+	            		if(dbName.equalsIgnoreCase("id")){
+	            			if(value == null)continue;
+	            			
+	            			dbName = "_id";
+	            		}else if(value instanceof MongodbModel){
 	            			value = encode(value);
 	            		}else if(value instanceof Collection){
 	            			List<Object> vl = new ArrayList<Object>();
