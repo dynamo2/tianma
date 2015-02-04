@@ -51,7 +51,7 @@ public class ObjectMetadataDao  extends AbstractDao {
 	}
 	
 	public void saveFields(String oid,ObjectField field) {
-		if(this.isDuplicateName(oid, field)){
+		if(this.isDuplicateMark(oid, field)){
 			throw new RuntimeException("Is duplicate field.name");
 		}
 		
@@ -96,14 +96,17 @@ public class ObjectMetadataDao  extends AbstractDao {
 		
 		//System.out.println(this.getByID("54c9e4b6fc778a8689446ce7"));
 		
-		System.out.println(isDuplicateName("54c9e4b6fc778a8689446ce7",of));
+		System.out.println(isDuplicateMark("54c9e4b6fc778a8689446ce7",of));
 	}
 	
-	protected boolean isDuplicateName(String oid,ObjectField field){
-		return isDuplicateName(oid,"fields","unique_mark",field.getUniqueMark(),field);
+	/**
+	 * 判断fields.unique_mark是否有重复的值
+	 * **/
+	protected boolean isDuplicateMark(String oid,ObjectField field){
+		return isDuplicate(oid,"fields","unique_mark",field.getUniqueMark(),field);
 	}
 	
-	protected boolean isDuplicateName(String oid,String parentKey,String fieldKey,String fieldValue,MongodbModel model){
+	protected boolean isDuplicate(String oid,String parentKey,String fieldKey,String fieldValue,MongodbModel model){
 		BasicDBObject doc = new BasicDBObject("_id",new ObjectId(oid));
 		doc.put(parentKey+"."+fieldKey, fieldValue);
 		
