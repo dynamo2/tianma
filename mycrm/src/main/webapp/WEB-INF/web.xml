@@ -166,6 +166,21 @@
 		<url-pattern>/faces/*</url-pattern>
 		<url-pattern>/icefaces/*</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value></param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/tianma/*</url-pattern>
+    </servlet-mapping>
+    
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
