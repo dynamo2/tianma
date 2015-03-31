@@ -16,229 +16,53 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ArithmeticExpression {
-	public static final String PLUS = "+";
-	public static final String SUBSTRUCTION = "-";
-	public static final String MULTIPLICATION = "*";
-	public static final String DIVISION = "/";
-	
-	private final String arithmeticSource;
-	private final String regex = "(.*)(\\+|\\-|\\*|/)(.*)";
-	private String leftParamKey;
-	private String rightParamKey;
-	private String operator;
-	
-	private Node leftNode;
-	private Node rightNode;
-	
-	public ArithmeticExpression(String arithSource){
-		this.arithmeticSource = arithSource;
-		
-		this.compile();
-	}
-	
-	public static String readExpression(String source,int startIndex){
-		return null;
-	}
-	
-	public void compile(){
-		Pattern pt = Pattern.compile(regex);
-		Matcher m = pt.matcher(arithmeticSource);
-		
-		this.leftParamKey = this.arithmeticSource;
-		if (m.find()) {
-			this.leftParamKey = m.group(1);
-			this.rightParamKey = m.group(3);
-			this.operator = m.group(2);
-		}
-	}
-	
-	public Object calculate(Map<String,Object> paramMap){
-		if(operator == null){
-			return this.readValue(paramMap, this.leftParamKey);
-		}
-		
-		Double lValue = new Double(this.readValue(paramMap, this.leftParamKey)+"");
-		Double rValue= new Double(this.readValue(paramMap, this.rightParamKey)+"");
-		
-		
-		if(PLUS.equalsIgnoreCase(this.operator)){
-			return lValue + rValue;
-		}
-		
-		if(SUBSTRUCTION.equalsIgnoreCase(this.operator)){
-			return lValue - rValue;
-		}
-		
-		if(MULTIPLICATION.equalsIgnoreCase(this.operator)){
-			return lValue * rValue;
-		}
-		
-		if(DIVISION.equalsIgnoreCase(this.operator)){
-			return lValue / rValue;
-		}
-		
-		return null;
-	}
-	
-	private Object readValue(Map<String,Object> paramMap,String paramKey){
-		String[] keys = paramKey.split("\\.");
-		
-		int i = 0;
-		Map<String,Object> object = paramMap;
-		Map<String,Object> parent = paramMap;
-		Object value = null;
-		for(String k:keys){
-			if(i++ < keys.length-1){
-				object = (Map<String,Object>)parent.get(k);
-				parent = object;
-			}else {
-				value = object.get(k);
-			}
-		}
-		return value;
-	}
-	
 	public static void main(String[] args) {
 		String source = "D20031130 13:34:23-3d";
 		Parentheses pt = Parentheses.compile(source,0);
 		
 		DateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
-		System.out.println(df.format(pt.getValue()));
+		System.out.println(df.format(pt.getValue(null)));
 		
 		pt = Parentheses.compile("'dafdsaf'+'fdasfad'", 0);
-		System.out.println(pt.getValue());
+		System.out.println(pt.getValue(null));
 		
 		pt = Parentheses.compile("2+3*(3+2*(8-6))*(8-4)+8-98+72/(3*3)", 0);
-		System.out.println(pt.getValue());
+		System.out.println(pt.getValue(null));
 		
-//		DateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
-//		System.out.println(df.format(Node.readDate("D2003-11-30 13:34:23")));
-//		
-//		Calendar   cal   =   Calendar.getInstance();  
-//		cal.setTime(Node.readDate("D2003-11-30 13:34:23")); 
-//		cal.add(Calendar.MONTH, 1);
-//		cal.add(Calendar.DAY_OF_MONTH, 2);
-//		cal.add(Calendar.HOUR_OF_DAY, 2);
-//		System.out.println(df.format(cal.getTime())); 
+		Map<String,Object> params = new HashMap<String,Object>();
+		Map<String,Object> goods = new HashMap<String,Object>();
+		Map<String,Object> user = new HashMap<String,Object>();
+		Map<String,Object> address = new HashMap<String,Object>();
+		goods.put("num",2);
+		goods.put("price", 3);
+		
+		user.put("age",8);
+		user.put("address", address);
+		
+		address.put("no",6);
+		
+		params.put("goods",goods);
+		params.put("user", user);
+		
+		pt = Parentheses.compile("goods.num+goods.price*(3+2*(user.age-user.address.no))*(8-4)+8-98+72/(3*3)", 0);
+		System.out.println("params:"+pt.getValue(params));
+		
+		params = new HashMap<String,Object>();
+		goods = new HashMap<String,Object>();
+		try {
+			goods.put("create_date", df.parseObject("2015年03月31日 14时04分32秒"));
+			params.put("goods",goods);
+			pt = Parentheses.compile("goods.create_date+1m", 0);
+			System.out.println("goods.create_date+1y:"+df.format(pt.getValue(params)));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
-	
-	public static void main2(String[] args) {
-		String source = "1+2*3*4*5/6-7+8*9+10-11";
-		
-		String[] sary = new String[source.length()];
-		StringBuffer sb = null;
-		int arrayIndex = -1;
-		List<Operator> priorityOpts = new ArrayList<Operator>();
-		for(int i = 0; i < source.length(); i++){
-			char ch = source.charAt(i);
-			
-			if(isOperator(ch)){
-				if(sb != null){
-					sary[++arrayIndex] = sb.toString();
-					sb = null;
-				}
-				
-				sary[++arrayIndex] = ch+"";
-				priorityOpts.add(new Operator(ch,arrayIndex));
-				
-				continue;
-			}
-			if(sb == null){
-				sb = new StringBuffer(ch);
-			}
-			
-			sb.append(ch);
-			
-			//The lasted
-			if(i == source.length()-1){
-				sary[++arrayIndex] = sb.toString();
-			}
-		}
-		
-		Collections.sort(priorityOpts);
-		
-		/*
-		for(int ii = 0; ii < sary.length; ii++){
-			if(sary[ii] != null){
-				//System.out.println(sary[ii]);
-			}
-		}
-		
-		System.out.println("");
-		System.out.println("********** Operators ***********");
-		for(Operator opp : priorityOpts){
-			System.out.println(opp);
-		}*/
-		
-		Map<Node,Set<Integer>> expreMap = new HashMap<Node,Set<Integer>>();
-		Expression root = null;
-		Set<Integer> indexSet = null;
-		for(Operator op:priorityOpts){
-			int opIndex = op.getIndex();
-			
-			int preIndex = opIndex-1;
-			int nextIndex = opIndex+1;
-			
-			Node preNode = getExpression(expreMap,preIndex);
-			Node nextNode = getExpression(expreMap,nextIndex);
-			
-			if(preNode == null){
-				preNode = new Operand(sary[preIndex]);
-			}
-			
-			if(nextNode == null){
-				nextNode = new Operand(sary[nextIndex]);
-			}
-			
-			root = new Expression();
-			root.setLeft(preNode);
-			root.setRight(nextNode);
-			root.setOperator(op);
-			
-			indexSet = new HashSet<Integer>();
-			if(expreMap.containsKey(preNode)){
-				indexSet.addAll(expreMap.remove(preNode));
-			}else {
-				indexSet.add(preIndex);
-			}
-			
-			if(expreMap.containsKey(nextNode)){
-				indexSet.addAll(expreMap.remove(nextNode));
-			}else {
-				indexSet.add(nextIndex);
-			}
-			indexSet.add(op.getIndex());
-			
-			expreMap.put(root, indexSet);
-		}
-		
-		System.out.println(root +" ="+root.getValue());
-	}
-	
-	private static Node getExpression(Map<Node,Set<Integer>> expreMap,int index){
-		if(expreMap == null || expreMap.isEmpty()){
-			return null;
-		}
-		
-		for(Map.Entry<Node, Set<Integer>> entry : expreMap.entrySet()){
-			for(Integer i:entry.getValue()){
-				if(i == index){
-					return entry.getKey();
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	public static boolean isOperator(char c){
-		return c == '+' || c == '-' || c == '*' || c == '/';
-	}
-	
+
 	static class Node {
 		public final static DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 		
-		public Object getValue(){
+		public Object getValue(Map<String,Object> paramsMap){
 			return null;
 		}
 		
@@ -298,8 +122,8 @@ public class ArithmeticExpression {
 			this.startIndex = index;
 		}
 		
-		public Object getValue(){
-			return expression.getValue();
+		public Object getValue(Map<String,Object> paramsMap){
+			return expression.getValue(paramsMap);
 		}
 		
 		public String expressionStr(){
@@ -321,7 +145,7 @@ public class ArithmeticExpression {
 			for(int i = index; i < source.length(); i++){
 				char ch = source.charAt(i);
 				
-				if(isOperator(ch)){
+				if(Operator.isOperator(ch)){
 					if(sb != null){
 						sary[++arrayIndex] = sb.toString();
 						sb = null;
@@ -409,6 +233,22 @@ public class ArithmeticExpression {
 			parentheses.expression = root;
 			return parentheses;
 		}
+		
+		private static Node getExpression(Map<Node,Set<Integer>> expreMap,int index){
+			if(expreMap == null || expreMap.isEmpty()){
+				return null;
+			}
+			
+			for(Map.Entry<Node, Set<Integer>> entry : expreMap.entrySet()){
+				for(Integer i:entry.getValue()){
+					if(i == index){
+						return entry.getKey();
+					}
+				}
+			}
+			
+			return null;
+		}
 	}
 	
 	static class Expression extends Node {
@@ -435,9 +275,9 @@ public class ArithmeticExpression {
 			this.operator = operator;
 		}
 		
-		public Object getValue(){
-			Object valueLeft = this.left.getValue();
-			Object valueRight = this.right.getValue();
+		public Object getValue(Map<String,Object> paramsMap){
+			Object valueLeft = this.left.getValue(paramsMap);
+			Object valueRight = this.right.getValue(paramsMap);
 			
 			if(valueLeft instanceof Date){
 				return calculateDate((Date)valueLeft,valueRight.toString());
@@ -590,7 +430,7 @@ public class ArithmeticExpression {
 			}
 		}
 		
-		public Object getValue(){//Map<String,Object> paramsMap){
+		public Object getValue(Map<String,Object> paramsMap){
 			if(this.isString()){
 				return this.operand.subSequence(1,this.operand.length()-1);
 			}
@@ -606,15 +446,33 @@ public class ArithmeticExpression {
 				return this.operand;
 			}
 			
-			if(this.isNumber()){
-				if(this.operand.contains(".")){
-					return new Double(this.operand);
-				}
-				
+			try {
 				return new Integer(this.operand);
+			}catch(NumberFormatException e){
+				try {
+					return new Double(this.operand);
+				}catch(NumberFormatException e1){}
 			}
 			
-			return null;
+			return readValue(paramsMap);
+		}
+		
+		private Object readValue(Map<String,Object> paramMap){
+			String[] keys = this.operand.split("\\.");
+			
+			int i = 0;
+			Map<String,Object> object = paramMap;
+			Map<String,Object> parent = paramMap;
+			Object value = null;
+			for(String k:keys){
+				if(i++ < keys.length-1){
+					object = (Map<String,Object>)parent.get(k);
+					parent = object;
+				}else {
+					value = object.get(k);
+				}
+			}
+			return value;
 		}
 		
 		public boolean isString(){
@@ -694,63 +552,103 @@ public class ArithmeticExpression {
 			}
 			return 100;
 		}
+		
+		public static boolean isOperator(char c){
+			return c == '+' || c == '-' || c == '*' || c == '/';
+		}
 	}
 	
-	
 	/*
-	class Node {
-		String source;
-		ArithmeticExpression arithmeticExpre;
-		String numberRegex = "^\\d\\d*\\.{0,1}\\d*\\d$";
+	public static void main2(String[] args) {
+		String source = "1+2*3*4*5/6-7+8*9+10-11";
 		
-		public Node(String s){
-			this.source = s;
-			if(this.source != null && !this.source.isEmpty()){
-				this.source = this.source.trim();
+		String[] sary = new String[source.length()];
+		StringBuffer sb = null;
+		int arrayIndex = -1;
+		List<Operator> priorityOpts = new ArrayList<Operator>();
+		for(int i = 0; i < source.length(); i++){
+			char ch = source.charAt(i);
+			
+			if(isOperator(ch)){
+				if(sb != null){
+					sary[++arrayIndex] = sb.toString();
+					sb = null;
+				}
+				
+				sary[++arrayIndex] = ch+"";
+				priorityOpts.add(new Operator(ch,arrayIndex));
+				
+				continue;
+			}
+			if(sb == null){
+				sb = new StringBuffer(ch);
+			}
+			
+			sb.append(ch);
+			
+			//The lasted
+			if(i == source.length()-1){
+				sary[++arrayIndex] = sb.toString();
 			}
 		}
 		
-		public Object getValue(Map<String,Object> paramMap){
-			if(this.isArithmeticExpression()){
-				ArithmeticExpression arithmetic = new ArithmeticExpression(this.source.substring(1,this.source.length()-1));
-				return arithmetic.calculate(paramMap);
+		Collections.sort(priorityOpts);
+		
+		/*
+		for(int ii = 0; ii < sary.length; ii++){
+			if(sary[ii] != null){
+				//System.out.println(sary[ii]);
 			}
-			
-			if(this.isString()){
-				return this.source.substring(1,this.source.length()-1);
-			}
-			
-			return new Double(this.source);
 		}
 		
-		public boolean isString(){
-			if(!this.isEmpty() && this.source.length()>=2){
-				return this.source.startsWith("'") && this.source.endsWith("'");
+		System.out.println("");
+		System.out.println("********** Operators ***********");
+		for(Operator opp : priorityOpts){
+			System.out.println(opp);
+		}*
+		
+		Map<Node,Set<Integer>> expreMap = new HashMap<Node,Set<Integer>>();
+		Expression root = null;
+		Set<Integer> indexSet = null;
+		for(Operator op:priorityOpts){
+			int opIndex = op.getIndex();
+			
+			int preIndex = opIndex-1;
+			int nextIndex = opIndex+1;
+			
+			Node preNode = getExpression(expreMap,preIndex);
+			Node nextNode = getExpression(expreMap,nextIndex);
+			
+			if(preNode == null){
+				preNode = new Operand(sary[preIndex]);
 			}
 			
-			return false;
-		}
-		
-		public boolean isArithmeticExpression(){
-			if(!this.isEmpty()){
-				return this.source.startsWith("(") && this.source.endsWith(")");
+			if(nextNode == null){
+				nextNode = new Operand(sary[nextIndex]);
 			}
 			
-			return false;
-		}
-		
-		private boolean isEmpty(){
-			return this.source == null || this.source.isEmpty();
-		}
-		
-		public boolean isNumber(){
-			if(!this.isEmpty())
-				return false;
+			root = new Expression();
+			root.setLeft(preNode);
+			root.setRight(nextNode);
+			root.setOperator(op);
 			
-			Pattern pt = Pattern.compile(numberRegex);
-			Matcher mt = pt.matcher(this.source);
-			return mt.find();
+			indexSet = new HashSet<Integer>();
+			if(expreMap.containsKey(preNode)){
+				indexSet.addAll(expreMap.remove(preNode));
+			}else {
+				indexSet.add(preIndex);
+			}
+			
+			if(expreMap.containsKey(nextNode)){
+				indexSet.addAll(expreMap.remove(nextNode));
+			}else {
+				indexSet.add(nextIndex);
+			}
+			indexSet.add(op.getIndex());
+			
+			expreMap.put(root, indexSet);
 		}
+		
+		System.out.println(root +" ="+root.getValue());
 	}*/
-	
 }
