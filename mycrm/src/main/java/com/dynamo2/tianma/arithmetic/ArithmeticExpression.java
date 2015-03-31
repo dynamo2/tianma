@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 public class ArithmeticExpression {
 	public static void main(String[] args) {
-		String source = "D20031130 13:34:23-3d";
+		String source = "   D20031130 13:34:23  -   3d   ";
 		Parentheses pt = Parentheses.compile(source,0);
 		
 		DateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
@@ -26,7 +26,7 @@ public class ArithmeticExpression {
 		pt = Parentheses.compile("'dafdsaf'+'fdasfad'", 0);
 		System.out.println(pt.getValue(null));
 		
-		pt = Parentheses.compile("2+3*(3+2*(8-6))*(8-4)+8-98+72/(3*3)", 0);
+		pt = Parentheses.compile("  2 + 3*(  3  +  2  *  (  8  -  6  )  )	  * 	 (  8  -  4  )  +  		8-98+72/(3*3)", 0);
 		System.out.println(pt.getValue(null));
 		
 		Map<String,Object> params = new HashMap<String,Object>();
@@ -147,7 +147,9 @@ public class ArithmeticExpression {
 				
 				if(Operator.isOperator(ch)){
 					if(sb != null){
-						sary[++arrayIndex] = sb.toString();
+						if(!sb.toString().trim().isEmpty()){
+							sary[++arrayIndex] = sb.toString().trim();
+						}
 						sb = null;
 					}
 					
