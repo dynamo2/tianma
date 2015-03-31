@@ -47,13 +47,22 @@ public class ArithmeticExpression {
 		pt = Parentheses.compile("goods.num+goods.price*(3+2*(user.age-user.address.no))*(8-4)+8-98+72/(3*3)", 0);
 		System.out.println("params:"+pt.getValue(params));
 		
+		//{name $eq 'wmx'} $and {age $eq 10}
+		String s = "{name $eq (goods.create_date+1m)} $and {age $eq (goods.num+goods.price*(3+2*(user.age-user.address.no))*(8-4)+8-98+72/(3*3))}";
+		pt = Parentheses.compile(s,10);
+		System.out.println("age eq:"+Parentheses.compile(s, 49).getValue(params));
+		//System.out.println("age eq:"+Parentheses.compile(s, 49).expressionStr());
+		System.out.println("pt : " + pt.expressionStr());
+		
 		params = new HashMap<String,Object>();
 		goods = new HashMap<String,Object>();
 		try {
 			goods.put("create_date", df.parseObject("2015年03月31日 14时04分32秒"));
 			params.put("goods",goods);
 			pt = Parentheses.compile("goods.create_date+1m", 0);
-			System.out.println("goods.create_date+1y:"+df.format(pt.getValue(params)));
+			//System.out.println("goods.create_date+1y:"+df.format(pt.getValue(params)));
+			
+			System.out.println("name eq:" + df.format(Parentheses.compile(s, 10).getValue(params)));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -127,7 +136,7 @@ public class ArithmeticExpression {
 		}
 		
 		public String expressionStr(){
-			return source.substring(this.startIndex,this.endIndex);
+			return source.substring(this.startIndex,this.endIndex+1);
 		}
 		
 		public static Parentheses compile(String source,int index) {
