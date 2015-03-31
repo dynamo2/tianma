@@ -16,8 +16,8 @@ import com.mongodb.DBObject;
 
 public class ObjectMetadataDao  extends AbstractDao {
 
-	private static String COLLECTION_NAME = "object_metadata";
-	private DBCollection dbColl = null;
+	protected static String COLLECTION_NAME = "object_metadata";
+	protected DBCollection dbColl = null;
 	
 	static {
 		INNER_TYPE.put("ObjectMetadata.fields",ObjectField.class);
@@ -40,6 +40,15 @@ public class ObjectMetadataDao  extends AbstractDao {
 		DBCursor cursor = this.dbColl.find(this.getObjectId(oid));
 		while(cursor.hasNext()){
 			return (BasicDBObject)cursor.next();
+		}
+		
+		return null;
+	}
+	
+	public ObjectMetadata getByUniqueMark(String mark){
+		DBCursor cursor = this.dbColl.find(new BasicDBObject("unique_mark",mark));
+		while(cursor.hasNext()){
+			return this.decode((BasicDBObject)cursor.next(), ObjectMetadata.class);
 		}
 		
 		return null;

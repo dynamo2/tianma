@@ -38,7 +38,7 @@ public class AbstractDao  {
 	}
 	
 	protected DBCollection getDBCollection(String name){
-		return db.getCollection("object_metadata");
+		return db.getCollection(name);
 	}
 	
 	protected BasicDBObject getObjectId(String oid){
