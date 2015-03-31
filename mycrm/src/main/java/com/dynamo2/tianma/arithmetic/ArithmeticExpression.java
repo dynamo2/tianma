@@ -111,7 +111,7 @@ public class ArithmeticExpression {
 		}
 	}
 	
-	static class Parentheses{
+	static class Parentheses extends Node{
 		private final String source;
 		private final int startIndex;
 		private int endIndex;
@@ -170,22 +170,17 @@ public class ArithmeticExpression {
 				
 				if(ch == ')'){
 					parentheses.endIndex = i;
-					if(sb != null){
-						sary[++arrayIndex] = sb.toString();
-					}
 					break;
 				}
 				
 				if(sb == null){
 					sb = new StringBuffer(ch);
 				}
-				
 				sb.append(ch);
-				
-				//The lasted
-				if(i == source.length()-1){
-					sary[++arrayIndex] = sb.toString();
-				}
+			}
+			
+			if(sb != null){
+				sary[++arrayIndex] = sb.toString();
 			}
 			
 			Collections.sort(priorityOpts);
