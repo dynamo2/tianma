@@ -340,7 +340,7 @@ public class WorkflowService {
 	public static void main(String[] args) {
 		String str = "{name:'user_grade',type:'object',related:'UserGrade',label:'会员等级',edit:{type:'radio',value:'id',label:'name'}}";
 		
-		Map map = new MapCompiler(str,1).map;
+		Map map = MapHelper.curlyToMap(str);
 		System.out.println(map);
 		System.out.println(map.get("edit").getClass());
 		
@@ -349,19 +349,19 @@ public class WorkflowService {
 		product.put("name", "Product");
 		
 		List<Map> fields = new ArrayList<Map>();
-		fields.add(compileMap("{name:name,type:string,label:名称,unique:{scope:brand}}"));
-		fields.add(compileMap("{name:product_type,type:object,related:ProductType,label:分类,edit:{type:select}}"));
-		fields.add(compileMap("{name:brand,type:object,related:Brand,label:品牌,edit:{type:select}}"));
-		fields.add(compileMap("{name:price,type:double,label:价格}"));
-		fields.add(compileMap("{name:production_date,type:date,label:生产日期}"));
-		fields.add(compileMap("{name:expiry_date,type:date,label:有效期}"));
-		fields.add(compileMap("{name:picture,type:string,label:图片,edit:{type:file}}"));
-		fields.add(compileMap("{description,type:string,label:描述,edit:{type:html}}"));
+		fields.add(MapHelper.curlyToMap("{name:name,type:string,label:名称,unique:{scope:brand}}"));
+		fields.add(MapHelper.curlyToMap("{name:product_type,type:object,related:ProductType,label:分类,edit:{type:select}}"));
+		fields.add(MapHelper.curlyToMap("{name:brand,type:object,related:Brand,label:品牌,edit:{type:select}}"));
+		fields.add(MapHelper.curlyToMap("{name:price,type:double,label:价格}"));
+		fields.add(MapHelper.curlyToMap("{name:production_date,type:date,label:生产日期}"));
+		fields.add(MapHelper.curlyToMap("{name:expiry_date,type:date,label:有效期}"));
+		fields.add(MapHelper.curlyToMap("{name:picture,type:string,label:图片,edit:{type:file}}"));
+		fields.add(MapHelper.curlyToMap("{description,type:string,label:描述,edit:{type:html}}"));
 		
 		//System.out.println(fields);
 		
 		edit();
-		System.out.println(compileMap("{field:brand,values:{list:brands,key:object.id,value:object.name}}"));
+		System.out.println(MapHelper.curlyToMap("{field:brand,values:{list:brands,key:object.id,value:object.name}}"));
 	}
 	
 	/***
@@ -404,13 +404,13 @@ public class WorkflowService {
 	 * 
 	 * **/
 	public static void edit(){
-		Map<String,Object> datas = compileMap("{product:db.Product.get(request.id)?request.id,brands:db.Brand.search()}");
+		Map<String,Object> datas = MapHelper.curlyToMap("{product:db.Product.get(request.id)?request.id,brands:db.Brand.search()}");
 		
 		Map<String,Object> form = new HashMap<String,Object>();
 		form.put("data", "product");
 		
 		List<Map<String,Object>> additions = new ArrayList<Map<String,Object>>();
-		additions.add(compileMap("{field:brand,values:{list:brands,key:object.id,value:object.name}}"));
+		additions.add(MapHelper.curlyToMap("{field:brand,values:{list:brands,key:object.id,value:object.name}}"));
 		form.put("additions", additions);
 		
 		Map<String,Object> editProductFlow1 = new HashMap<String,Object>();
@@ -420,173 +420,100 @@ public class WorkflowService {
 		editProductFlow1.put("form", form);
 		editProductFlow1.put("response", "form");
 		
-		readFlow(editProductFlow1,null);
+		readFlow(editProductFlow1,new HashMap<String,Object>());
 		
 		System.out.println("edit ok");
 	}
 	
 	private static void readFlow(Map<String,Object> flow,Map<String,Object> params){
 		if(flow.containsKey("datas")){
-			Map<String,Object> datas = (Map<String,Object>)flow.get("datas");
-			for(Map.Entry<String, Object> entry : datas.entrySet()){
-				String expression = (String)entry.getValue();
-				if(expression.contains("?")){
-					String[] sa = expression.split("\\?");
-					String condition = sa[1];
+			readDatas((Map<String,Object>)flow.get("datas"),params);
+		}
+	}
+	
+	private static void readDatas(Map<String,Object> datas,Map<String,Object> params){
+		for(Map.Entry<String, Object> entry : datas.entrySet()){
+			String expression = (String)entry.getValue();
+			if(expression.contains("?")){
+				String[] sa = expression.split("\\?");
+				String condition = sa[1];
+				
+				if(getValue(params,condition) == null){
+					entry.setValue(null);
+					params.put(entry.getKey(),null);
 					
-					/*
-					if(getValue(params,condition) == null){
-						datas.put(entry.getKey(), null);
-						continue;
-					}*/
-					
-					expression = sa[0];
+					continue;
 				}
 				
-				StringBuffer sbf = null;
-				boolean readAll = false;
-				List<String> keys = new ArrayList<String>();
-				for(int i = 0; i < expression.length(); i++){
-					char c = expression.charAt(i);
-					
-					if(!readAll && c == '.'){
-						if(sbf != null){
-							keys.add(sbf.toString());
-							sbf = null;
-							
-							continue;
-						}
-					}
-					
-					if(c == '('){
-						if(sbf != null){
-							keys.add(sbf.toString());
-							readAll = true;
-							sbf = null;
-							
-							continue;
-						}
-					}
-					
-					if(c == ')'){
-						if(sbf != null){
-							keys.add(sbf.toString());
-							readAll = false;
-							sbf = null;
-							
-							continue;
-						}
-					}
-					
-					if(sbf == null){
-						sbf = new StringBuffer();
-					}
-					sbf.append(c);
-				}
-				
-				if(keys.get(0).equals("db")){
-					String collection = keys.get(1);
-					String method = keys.get(2);
-					String parameter = null;	
-					Object paramValue = null;
-					if(keys.size() ==4){
-						parameter = keys.get(3);
-						paramValue = getValue(params,parameter);
-					}
-					
-					DBService dbService = new DBService(collection);
-					if(method.equals("get")){
-						if(parameter != null){
-							dbService.get(paramValue);
-						}
-					}
-				}
-				System.out.println("keys = "+keys);
+				expression = sa[0];
 			}
+			
+			StringBuffer sbf = null;
+			boolean readAll = false;
+			List<String> keys = new ArrayList<String>();
+			for(int i = 0; i < expression.length(); i++){
+				char c = expression.charAt(i);
+				
+				if(!readAll && c == '.'){
+					if(sbf != null){
+						keys.add(sbf.toString());
+						sbf = null;
+						
+						continue;
+					}
+				}
+				
+				if(c == '('){
+					if(sbf != null){
+						keys.add(sbf.toString());
+						readAll = true;
+						sbf = null;
+						
+						continue;
+					}
+				}
+				
+				if(c == ')'){
+					if(sbf != null){
+						keys.add(sbf.toString());
+						readAll = false;
+						sbf = null;
+						
+						continue;
+					}
+				}
+				
+				if(sbf == null){
+					sbf = new StringBuffer();
+				}
+				sbf.append(c);
+			}
+			
+			Object value = null;
+			if(keys.get(0).equals("db")){
+				String collection = keys.get(1);
+				String method = keys.get(2);
+				String parameter = null;	
+				Object paramValue = null;
+				if(keys.size() == 4){
+					parameter = keys.get(3);
+					paramValue = getValue(params,parameter);
+				}
+				
+				DBService dbService = new DBService(collection);
+				if(method.equals("get")){
+					if(parameter != null){
+						//value = dbService.get(paramValue);
+					}
+				}
+			}
+			
+			params.put(entry.getKey(), value);
+			entry.setValue(value);
 		}
 	}
 	
 	private static Object getValue(Map<String,Object> params,String varName){
 		return null;
 	}
-	
-	private static Map<String,Object> compileMap(String str){
-		return new MapCompiler(str,1).map;
-	}
-
-	static class DBService {
-		String collection;
-		public DBService(String coll){
-			this.collection = coll;
-		}
-		
-		public Object get(String id){
-			return null;
-		}
-		
-		public Object get(Object id){
-			return null;
-		}
-	}
-	
-	static class MapCompiler {
-		private int cursor = 0;
-		private String source = null;
-		Map<String,Object> map = null;
-		
-		public MapCompiler(String source,int s){
-			this.cursor = s;
-			this.source = source;
-			
-			this.map = map();
-		}
-		
-		private Map<String,Object> map(){
-			Map<String,Object> map = new HashMap<String,Object>();
-			String key = null;
-			String value = null;
-			StringBuffer sbf = null;
-			char c = 0;
-			for(; cursor < this.source.length();){
-				c = this.source.charAt(cursor++);
-				
-				if(c == '}'){
-					if(key != null && sbf != null){
-						map.put(key, sbf.toString());
-					}
-					
-					return map;
-				}
-				if(c == ':'){
-					key = sbf.toString();
-					sbf = null;
-					continue;
-				}
-				if(c == ','){
-					value = sbf.toString();
-					map.put(key, value);
-					
-					sbf = null;
-					key = null;
-					continue;
-				}
-				if(c == '{'){
-					map.put(key,map());
-					sbf = null;
-					continue;
-				}
-				
-				if(sbf == null){
-					sbf = new StringBuffer("");
-				}
-				sbf.append(c);
-			}
-			
-			if(key != null && sbf != null){
-				map.put(key, sbf.toString());
-			}
-			return map;
-		}
-	}
-	
 }
