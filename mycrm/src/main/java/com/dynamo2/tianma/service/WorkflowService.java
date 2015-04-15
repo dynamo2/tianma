@@ -339,25 +339,7 @@ public class WorkflowService {
 	
 	
 	public static void main(String[] args) {
-		
-		Map<String,Object> product = new HashMap<String,Object>();
-		product.put("_id", new ObjectId());
-		product.put("name", "Product");
-		
-		List<Map> fields = new ArrayList<Map>();
-		fields.add(MapHelper.curlyToMap("{name:name,type:string,label:名称,unique:{scope:brand}}"));
-		fields.add(MapHelper.curlyToMap("{name:product_type,type:object,related:ProductType,label:分类,edit:{type:select}}"));
-		fields.add(MapHelper.curlyToMap("{name:brand,type:object,related:Brand,label:品牌,edit:{type:select}}"));
-		fields.add(MapHelper.curlyToMap("{name:price,type:double,label:价格}"));
-		fields.add(MapHelper.curlyToMap("{name:production_date,type:date,label:生产日期}"));
-		fields.add(MapHelper.curlyToMap("{name:expiry_date,type:date,label:有效期}"));
-		fields.add(MapHelper.curlyToMap("{name:picture,type:string,label:图片,edit:{type:file}}"));
-		fields.add(MapHelper.curlyToMap("{description,type:string,label:描述,edit:{type:html}}"));
-		
-		//System.out.println(fields);
-		
 		edit();
-		//System.out.println(MapHelper.curlyToMap("{field:brand,values:{list:brands,key:object.id,value:object.name}}"));
 	}
 	
 	/***
@@ -393,9 +375,9 @@ public class WorkflowService {
 	 * }
 	 * 
 	 * EditProductFlow2 {
-	 *   function:db.Product.save(request.product)
-	 *   response:form
+	 *   function:db.Product.save(request.Product)
 	 * }
+	 * 
 	 * 
 	 * **/
 	public static void edit(){
@@ -410,8 +392,47 @@ public class WorkflowService {
 		System.out.println(product);
 		
 		//Map<String,Object> params = MapHelper.curlyToMap("{request:{id:"+product.get("id")+"}}");
-		Map<String,Object> params = MapHelper.curlyToMap("{request:{id:"+product.get("id")+"eee}}");
+		Map<String,Object> params = MapHelper.curlyToMap("{request:{id:"+product.get("id")+"}}");
 		readFlow(editProductFlow1,params);
+	}
+	
+	/**
+	 * SearchProduct {
+	 *   _id:objectId,
+	 *   name:'search product',
+	 *   flows:[{step:1,
+	 *   		datas:[{product_list:db.Product.search({name $like request.product.name 
+	 *          				and brand $eq request.product.brand 
+	 *          				and price $gte request.product.min_price 
+	 *          				and price $lte request.product.max_price
+	 *          				and expiry_date $gte request.product.min_expiry_date?
+	 *          				and expiry_date $lte request.product.min_expiry_date?}),
+	 *          		brand_list:db.Brand.search({name $eq 'ww'})}],
+	 *   		forms:[
+	 *            {name:'product.id',type:'hidden',value:product.id},
+	 *            {name:'product.name',type:'text',value:product.name},
+	 *            {name:'product.brand',type:'select',value:product.brand,
+	 *               values:{
+	 *              	data:brand_list,
+	 *              	key:brand_list.object.id,
+	 *                  value:brand_list.object.name}
+	 *            },
+	 *            {name:'product.min_price',type:'text',value:product.min_price},
+	 *            {name:'product.max_price',type:'text',value:product.max_price},
+	 *            {name:'product.expiry_date',type:'text',value:product.expiry_date},
+	 *            ],
+	 *           list_table:{data:list,page:true,
+	 *           	columns:[{label:'名称',value:list.object.name},
+	 *           		{label:'品牌',value:list.object.brand.name},
+	 *           		{label:'价格',value:list.object.price},
+	 *           		{label:'有效期',value:list.object.expiry_date}]
+	 *           }
+	 *           response:[forms,list_table]}
+	 *   ]
+	 * }
+	 * **/
+	public static void search(){
+		
 	}
 	
 	/**
@@ -432,9 +453,13 @@ public class WorkflowService {
 			datas = (Map<String,Object>)flow.get("datas");
 			readDatas(datas,params);
 		}
-		
-		JSONArray js = null;
 
+		String formJson = readForm(flow,params);
+		System.out.println(formJson);
+	}
+	
+	private static String readForm(Map<String,Object> flow,Map<String,Object> params){
+		Map<String,Object> datas = (Map<String,Object>)flow.get("datas");
 		Object v = flow.get("type");
 		if(v != null){
 			String type = (String)v;
@@ -462,7 +487,6 @@ public class WorkflowService {
 						if("object".equals(field.get("type"))){
 							fieldValue = ((Map<String,Object>)fieldValue).get("id").toString();
 						}
-						
 						fieldInfo.put("value", fieldValue);
 					}
 					
@@ -472,7 +496,6 @@ public class WorkflowService {
 					String inputType = (String)MapHelper.readValue(field, "edit.type","text");
 					if("select".equals(inputType)){
 						inputType = "select";
-						
 						fieldInfo.put("options",readOptions(flow,fieldName));
 					}else if("radio".equals(v)){
 						inputType = "radio";
@@ -481,15 +504,19 @@ public class WorkflowService {
 					}
 					
 					fieldJson.put("type", inputType);
-					
 					json.add(fieldJson);
 				}
-				
-				System.out.println(json);
-				
-				System.out.println(JSONArray.fromObject(json).toString());
+
+				if(editCollection != null && editCollection.get("id") != null){
+					String str = "{type:hidden,info:{name:"+collection+".id,value:"+editCollection.get("id")+"}}";
+					json.add(MapHelper.curlyToMap(str));
+				}
+
+				//System.out.println(JSONArray.fromObject(json).toString());
+				return JSONArray.fromObject(json).toString();
 			}
 		}
+		return null;
 	}
 	
 	private static List<Map<String,Object>> readOptions(Map<String,Object> flow,String fieldName){
