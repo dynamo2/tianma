@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.json.JSONArray;
 import org.bson.types.ObjectId;
 
 public class WorkflowService {
@@ -338,11 +339,6 @@ public class WorkflowService {
 	
 	
 	public static void main(String[] args) {
-		String str = "{name:'user_grade',type:'object',related:'UserGrade',label:'会员等级',edit:{type:'radio',value:'id',label:'name'}}";
-		
-		Map map = MapHelper.curlyToMap(str);
-		System.out.println(map);
-		System.out.println(map.get("edit").getClass());
 		
 		Map<String,Object> product = new HashMap<String,Object>();
 		product.put("_id", new ObjectId());
@@ -361,7 +357,7 @@ public class WorkflowService {
 		//System.out.println(fields);
 		
 		edit();
-		System.out.println(MapHelper.curlyToMap("{field:brand,values:{list:brands,key:object.id,value:object.name}}"));
+		//System.out.println(MapHelper.curlyToMap("{field:brand,values:{list:brands,key:object.id,value:object.name}}"));
 	}
 	
 	/***
@@ -393,8 +389,7 @@ public class WorkflowService {
 	 *   type:edit,
 	 *   collection:Product,
 	 *   form:{data:product,
-	 *   	additions:[{field:brand,values:{list:brands,key:object.id,value:object.name}}]},
-	 *   response:form
+	 *   	additions:[{field:brand,values:{list:brands,key:object.id,value:object.name}}]}
 	 * }
 	 * 
 	 * EditProductFlow2 {
@@ -404,31 +399,120 @@ public class WorkflowService {
 	 * 
 	 * **/
 	public static void edit(){
-		Map<String,Object> datas = MapHelper.curlyToMap("{product:db.Product.get(request.id)?request.id,brands:db.Brand.search()}");
+		String str = "{datas:{product:db.Product.get(request.id)?request.id,brands:db.Brand.query(),"
+						+ "types:db.ProductType.search()},"
+						+ "type:edit,collection:Product,form:{data:product,"
+						+ "additions:{brand:{values:{list:brands,key:id,value:name}},"
+						+ "product_type:{values:{list:types,key:id,value:name}}}]}}";
+		Map<String,Object> editProductFlow1 = MapHelper.curlyToMap(str);
 		
-		Map<String,Object> form = new HashMap<String,Object>();
-		form.put("data", "product");
+		Map<String,Object> product = DBData.getRandom("Product");
+		System.out.println(product);
 		
-		List<Map<String,Object>> additions = new ArrayList<Map<String,Object>>();
-		additions.add(MapHelper.curlyToMap("{field:brand,values:{list:brands,key:object.id,value:object.name}}"));
-		form.put("additions", additions);
-		
-		Map<String,Object> editProductFlow1 = new HashMap<String,Object>();
-		editProductFlow1.put("datas", datas);
-		editProductFlow1.put("type", "edit");
-		editProductFlow1.put("collection", "Product");
-		editProductFlow1.put("form", form);
-		editProductFlow1.put("response", "form");
-		
-		readFlow(editProductFlow1,new HashMap<String,Object>());
-		
-		System.out.println("edit ok");
+		//Map<String,Object> params = MapHelper.curlyToMap("{request:{id:"+product.get("id")+"}}");
+		Map<String,Object> params = MapHelper.curlyToMap("{request:{id:"+product.get("id")+"eee}}");
+		readFlow(editProductFlow1,params);
 	}
 	
+	/**
+	 * EditProductFlow1 {
+	 *   datas:{product:db.Product.get(request.id)?request.id,
+	 *   		brands:db.Brand.query(),
+	 *   		types:db.ProductType.search()},
+	 *   type:edit,
+	 *   collection:Product,
+	 *   form:{data:product,
+	 *   	additions:{brand:{values:{list:brands,key:id,value:name}},
+	 *   		product_type:{values:{list:types,key:id,value:name}}}]}
+	 * }
+	 * **/
 	private static void readFlow(Map<String,Object> flow,Map<String,Object> params){
+		Map<String,Object> datas = null;
 		if(flow.containsKey("datas")){
-			readDatas((Map<String,Object>)flow.get("datas"),params);
+			datas = (Map<String,Object>)flow.get("datas");
+			readDatas(datas,params);
 		}
+		
+		JSONArray js = null;
+
+		Object v = flow.get("type");
+		if(v != null){
+			String type = (String)v;
+			if(type.equals("edit")){
+				List json = new ArrayList();
+				
+				String dataKey = (String)MapHelper.readValue(flow, "form.data");
+				Map<String,Object> editCollection = (Map<String,Object>)MapHelper.readValue(datas,dataKey);
+				
+				String collection = (String)flow.get("collection");
+				Map<String,Object> collMetadata = (Map<String,Object>)DBData.ObjectMetadataMap.get(collection);
+				List<Map<String,Object>> fields = (List<Map<String,Object>>)collMetadata.get("fields");
+				for(Map<String,Object> field : fields){
+					Map<String,Object> fieldJson = new HashMap<String,Object>();
+					
+					Map<String,Object> fieldInfo = new HashMap<String,Object>();
+					String fieldName = (String)field.get("name");
+					Object fieldValue = null;
+					if(editCollection != null){
+						fieldValue = editCollection.get(fieldName);
+					}
+					
+					fieldInfo.put("name", collection+"."+fieldName);
+					if(fieldValue != null){
+						if("object".equals(field.get("type"))){
+							fieldValue = ((Map<String,Object>)fieldValue).get("id").toString();
+						}
+						
+						fieldInfo.put("value", fieldValue);
+					}
+					
+					fieldJson.put("label", field.get("label"));
+					fieldJson.put("info", fieldInfo);
+
+					String inputType = (String)MapHelper.readValue(field, "edit.type","text");
+					if("select".equals(inputType)){
+						inputType = "select";
+						
+						fieldInfo.put("options",readOptions(flow,fieldName));
+					}else if("radio".equals(v)){
+						inputType = "radio";
+					}else if("checkbox".equals(v)){
+						inputType = "checkbox";
+					}
+					
+					fieldJson.put("type", inputType);
+					
+					json.add(fieldJson);
+				}
+				
+				System.out.println(json);
+				
+				System.out.println(JSONArray.fromObject(json).toString());
+			}
+		}
+	}
+	
+	private static List<Map<String,Object>> readOptions(Map<String,Object> flow,String fieldName){
+		Map<String,Object> addition = (Map<String,Object>)MapHelper.readValue(flow, "form.additions."+fieldName);
+		
+		String dataKey = (String)MapHelper.readValue(addition, "values.list");
+		List<Map<String,Object>> list = (List<Map<String,Object>>)MapHelper.readValue(flow, "datas."+dataKey);
+		List<Map<String,Object>> options = new ArrayList<Map<String,Object>>();
+		if(list == null || list.size()== 0){
+			return options;
+		}
+		
+		Object key = MapHelper.readValue(addition, "values.key","id");
+		Object value = MapHelper.readValue(addition, "values.value","name");
+		for(Map<String,Object> obj:list){
+			Map option = new HashMap();
+			
+			option.put("key", obj.get(key).toString());
+			option.put("label", obj.get(value).toString());
+			
+			options.add(option);
+		}
+		return options;
 	}
 	
 	private static void readDatas(Map<String,Object> datas,Map<String,Object> params){
@@ -438,7 +522,7 @@ public class WorkflowService {
 				String[] sa = expression.split("\\?");
 				String condition = sa[1];
 				
-				if(getValue(params,condition) == null){
+				if(MapHelper.readValue(params,condition) == null){
 					entry.setValue(null);
 					params.put(entry.getKey(),null);
 					
@@ -497,23 +581,15 @@ public class WorkflowService {
 				Object paramValue = null;
 				if(keys.size() == 4){
 					parameter = keys.get(3);
-					paramValue = getValue(params,parameter);
+					paramValue = MapHelper.readValue(params,parameter);
 				}
 				
 				DBService dbService = new DBService(collection);
-				if(method.equals("get")){
-					if(parameter != null){
-						//value = dbService.get(paramValue);
-					}
-				}
+				value = dbService.invoke(method, paramValue);
 			}
 			
 			params.put(entry.getKey(), value);
 			entry.setValue(value);
 		}
-	}
-	
-	private static Object getValue(Map<String,Object> params,String varName){
-		return null;
 	}
 }

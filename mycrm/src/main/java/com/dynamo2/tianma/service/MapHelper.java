@@ -20,6 +20,40 @@ public class MapHelper {
 		System.out.println(curlyToMap(" { id:  1  ,b:,c:{d:7,e:{g:,f:9}},y:[{aa:4,bb:5,tt:[{aaa:34,bbb:fda,ccc:98}]},{dd:45,ee:fda},{rr:45,hh:fda}] }  "));
 	}
 	
+	public static Object readValue(Map<String,Object> paramMap,String paramKey,Object defaultValue){
+		Object value = readValue(paramMap,paramKey);
+		if(value == null){
+			return defaultValue;
+		}
+		
+		return value;
+	}
+	public static Object readValue(Map<String,Object> paramMap,String paramKey){
+		if(paramMap == null || paramMap.size() == 0 
+				|| paramKey == null || paramKey.trim().isEmpty()){
+			return null;
+		}
+		
+		String[] keys = paramKey.split("\\.");
+		int i = 0;
+		Map<String,Object> object = paramMap;
+		Map<String,Object> parent = paramMap;
+		Object value = null;
+		for(String k:keys){
+			if(i++ < keys.length-1){
+				object = (Map<String,Object>)parent.get(k);
+				if(object == null){
+					return null;
+				}
+				
+				parent = object;
+			}else {
+				value = object.get(k);
+			}
+		}
+		return value;
+	}
+	
 	public static Map<String,Object> curlyToMap(String str){
 		if(str == null && str.trim().isEmpty()){
 			return null;
