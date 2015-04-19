@@ -408,14 +408,11 @@ public class WorkflowService {
 	 *          				and expiry_date $gte request.product.min_expiry_date?
 	 *          				and expiry_date $lte request.product.min_expiry_date?}),
 	 *          		brand_list:db.Brand.search({name $eq 'ww'})}],
-	 *   		forms:[
+	 *   		forms:[data:request.product,
 	 *            {name:'product.id',type:'hidden',value:product.id},
 	 *            {name:'product.name',type:'text',value:product.name},
 	 *            {name:'product.brand',type:'select',value:product.brand,
-	 *               values:{
-	 *              	data:brand_list,
-	 *              	key:brand_list.object.id,
-	 *                  value:brand_list.object.name}
+	 *               values:{list:brand_list,key:id,value:name}
 	 *            },
 	 *            {name:'product.min_price',type:'text',value:product.min_price},
 	 *            {name:'product.max_price',type:'text',value:product.max_price},
@@ -433,6 +430,28 @@ public class WorkflowService {
 	 * **/
 	public static void search(){
 		
+	}
+	
+	
+	/**
+	 * search_form:{view:form,type:search,
+	 * 		form:{name:product.searchForm},
+	 *      inputs:[{name:fid,type:hidden,value:request.fid},
+	 *            {name:product.name,type:text,label:名称,value:request.product.name},
+	 *            {name:product.brand,type:select,label:品牌,value:request.product.brand,
+	 *               	values:{list:brand_list,key:id,value:name}},
+	 *            {name:product.price,type:text,operator:between,value:request.product.price},
+	 *            {name:'product.expiry_date',type:'text',value:request.product.expiry_date}]}
+	 * **/
+	public static void responseForm(){
+		String str = "forms:[data:request.product,"
+				+ "{name:'product.id',type:'hidden',value:product.id},"
+				+ "{name:'product.name',type:'text',label:名称,value:product.name},"
+				+ "{name:'product.brand',type:'select',label:,value:product.brand,"
+					+ "values:{list:brand_list,key:id,value:name}},"
+				+ "{name:'product.min_price',type:'text',value:product.min_price},"
+				+ "{name:'product.max_price',type:'text',value:product.max_price},"
+				+ "{name:'product.expiry_date',type:'text',value:product.expiry_date}]";
 	}
 	
 	/**
